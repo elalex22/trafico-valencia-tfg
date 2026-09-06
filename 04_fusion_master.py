@@ -45,7 +45,9 @@ def construir_base(buf_start, end, node_ids, asig):
     return base
 
 
-# ── Fusión por fuente (idéntico patrón al confirmado en el bloque de fusión) ──
+# ── Fusión por fuente: cada función carga los datos ya procesados de esa
+# fuente, los agrega a 15 min si hace falta, y los une a `base` por
+# (timestamp, id_sensor), añadiendo su máscara de validez ──
 
 def fusionar_ih_trafico(base, buf_start, end):
     df = load_and_filter(PROC / 'espires_trafico.parquet', buf_start, end)
@@ -82,15 +84,12 @@ def fusionar_valenbici(base, buf_start, end):
 
 
 def fusionar_bici(base, buf_start, end):
-    """CORREGIDO tras revisión a fondo: el apartado 4.3 de la memoria dice
-    'Espiras tráfico / bici: valores -1 (fallo de sensor) → clip(lower=0) +
-    máscara binaria' para AMBAS fuentes. El target (tráfico) ya lo tenía
-    resuelto (racha de ceros en 04 + limpiar_y_log en 05), pero ih_bici
-    (una feature, no el target) solo tenía mask_ih_bici=notna() — que no
-    detecta -1 (no es NaN). Se añade aquí el mismo criterio: -1 -> mask=0
-    + valor a 0. Como 05_pipeline_tensores.py ya usa MASK_POR_FEATURE para
-    excluir de la media/std cualquier celda con máscara=0, basta con
-    corregir la máscara aquí — no hace falta tocar 05."""
+    """Igual que las demás fuentes, con una corrección adicional: -1 es un
+    código de fallo de sensor, no un valor real, así que se trata como
+    inválido (mask=0) igual que un NaN, y se recorta a 0. Como
+    05_pipeline_tensores.py usa MASK_POR_FEATURE para excluir de la
+    media/std cualquier celda con máscara=0, basta con corregir la
+    máscara aquí para que la normalización ya lo tenga en cuenta."""
     df_b = load_and_filter(PROC / 'espires_bici.parquet', buf_start, end)
     df_b = aggregate_15min(df_b, 'timestamp', 'id_sensor', 'ih_bici', 'mean')
     df_b = df_b.rename(columns={'id_sensor': 'id_bici_cercano'})
