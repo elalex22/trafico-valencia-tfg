@@ -5,38 +5,26 @@ Valenbisi) + asignación al nodo de tráfico más cercano (cKDTree).
 Requiere haber ejecutado antes 02_construccion_grafo.py
 (necesita node_order_1035.csv y espira_to_tramo.csv).
 
-── CAMBIOS respecto a la versión anterior (reconstrucción sin confirmar) ──
-1. cKDTree en vez de KDTree, para que coincida literalmente con la memoria
-   (Tabla 5.1: "Asignación de sensores exógenos mediante cKDTree").
-   Numéricamente no cambia el resultado del vecino más cercano, pero el
-   código ahora dice lo que la memoria dice.
-2. `normalize_id()` — SOLO para `id_tramo`, igual que hace de verdad
-   `04_fusion_master.py`. `id_sensor`/`id_estacion` se mantienen como
-   enteros (mismo tipo que produce `01_extraccion.py` y
-   `02_construccion_grafo.py`); convertirlos a string era una
-   convención paralela innecesaria — revertido tras revisar el código
-   real y confirmar que `04` nunca los renormaliza.
-3. CORRECCIÓN DE SESGO DE DISTANCIA: antes se calculaba
-   `distancia_m = grados * 111_320` para latitud Y longitud por igual.
-   A la latitud de Valencia (39,47°N) eso sobreestima ~29,5% las
-   distancias con componente este-oeste (verificado en sandbox: 1° de
-   longitud son 85.934 m reales, no 111.320 m). Ahora se proyecta lat/lon
-   a un plano local en metros ANTES de construir el árbol, así que tanto
-   la elección del vecino más cercano como la distancia reportada quedan
-   corregidas — no es solo un cambio de cómo se informa el número, sino
-   de qué vecino se elige.
-4. Extracción de coords de bici/Valenbisi SIN cortes arbitrarios
-   (los cortes >=200 / >=275 de la reconstrucción anterior no estaban
-   justificados; aquí se recorren todos los ZIPs, igual que hace
-   02_construccion_grafo.py con las espiras de tráfico, y se imprime el
-   nº real de sensores encontrados para contrastarlo con la Tabla 4.1:
-   136 bici / 276 Valenbisi).
-5. La corrección de coordenadas corruptas de ruido (394.631.424 ->
-   39.4631424, apartado 4.3) ahora se aplica EN ORIGEN, dentro de
-   01_extraccion.py (extraer_ruido), no aquí. Este script solo hace un
-   chequeo de seguridad pasivo: si detecta coordenadas de ruido fuera del
-   rango geográfico de Valencia, avisa (señal de que la corrección de 01
-   no se está aplicando o no cubre el patrón real).
+Notas de implementación:
+
+- Se usa `cKDTree` para el vecino más cercano.
+- `normalize_id()` se aplica solo a `id_tramo` (igual que hace
+  `04_fusion_master.py`); `id_sensor`/`id_estacion` se mantienen como
+  enteros, coherente con el tipo que producen `01_extraccion.py` y
+  `02_construccion_grafo.py`.
+- Las distancias se calculan proyectando lat/lon a un plano local en
+  metros (escalando la longitud por cos(lat_ref)) antes de construir el
+  árbol, en vez de aplicar el mismo factor (111.320 m/°) a latitud y
+  longitud por igual — a la latitud de Valencia (39,47°N), 1° de
+  longitud son ~85.934 m reales, no 111.320 m, así que ese atajo
+  sobreestimaría casi un 30% las distancias con componente este-oeste.
+- La extracción de coordenadas de bici/Valenbisi recorre todos los ZIPs
+  disponibles sin cortes anticipados, e imprime el nº de sensores
+  encontrados.
+- La corrección de coordenadas corruptas de ruido se aplica en origen,
+  en `01_extraccion.py`; este script solo hace una comprobación pasiva:
+  si detecta coordenadas de ruido fuera del rango geográfico de
+  Valencia, avisa por si la corrección de `01` no cubre el caso.
 
 Genera:
   - eda_grafo/coords_espiras_bici_v2.csv
@@ -56,7 +44,8 @@ LAT_REF = 39.47
 
 
 # ══════════════════════════════════════════════════════════════
-# Normalización de IDs — idéntica a la confirmada en el código real
+# Normalización de identificadores heterogéneos (int, float con .0,
+# str) a string limpio.
 # ══════════════════════════════════════════════════════════════
 def normalize_id(x):
     if pd.isna(x):
@@ -130,8 +119,7 @@ def extraer_coords_bici():
     ]).sort_values('id_sensor').reset_index(drop=True)
 
     df_coords.to_csv(EDA / 'coords_espiras_bici_v2.csv', index=False)
-    print(f'  Guardado: coords_espiras_bici_v2.csv ({len(df_coords)} sensores) '
-          f'— memoria (Tabla 4.1) dice 136, confirmar aquí')
+    print(f'  Guardado: coords_espiras_bici_v2.csv ({len(df_coords)} sensores)')
     return df_coords
 
 
@@ -185,8 +173,7 @@ def extraer_coords_valenbici():
     ]).sort_values('id_estacion').reset_index(drop=True)
 
     df_coords.to_csv(EDA / 'coords_valenbici.csv', index=False)
-    print(f'  Guardado: coords_valenbici.csv ({len(df_coords)} estaciones) '
-          f'— memoria (Tabla 4.1) dice 276, confirmar aquí')
+    print(f'  Guardado: coords_valenbici.csv ({len(df_coords)} estaciones)')
     return df_coords
 
 
@@ -201,14 +188,12 @@ def cargar_coords_ruido():
                      .first()
                      .reset_index())
 
-    print(f'  Coords ruido: {len(coords_ruido)} sensores — '
-          f'memoria (Tabla 4.1) dice 15, confirmar aquí')
+    print(f'  Coords ruido: {len(coords_ruido)} sensores')
 
     # Chequeo de seguridad pasivo: la corrección de coordenadas corruptas
-    # (apartado 4.3) ya se aplica en origen, en 01_extraccion.py. Si aquí
-    # aparecen coordenadas fuera del rango de Valencia, es señal de que esa
-    # corrección no se está aplicando o no cubre el patrón real — revisar
-    # extraer_ruido() en 01_extraccion.py, no parchearlo aquí.
+    # ya se aplica en origen, en 01_extraccion.py. Si aquí aparecen
+    # coordenadas fuera del rango de Valencia, revisar extraer_ruido() en
+    # 01_extraccion.py en vez de parchearlo aquí.
     fuera_rango = coords_ruido[
         ~coords_ruido['lat'].between(39.0, 40.0) |
         ~coords_ruido['lon'].between(-1.0, 0.0)
