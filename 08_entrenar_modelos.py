@@ -1,14 +1,12 @@
 """
-08_entrenar_modelos.py — Entrena las 9 arquitecturas del apartado 5.7 de
-la memoria (Persistencia no necesita entrenamiento, tiene 0 parámetros y
-ya la calcula 07_baseline_persistencia.py).
+08_entrenar_modelos.py — Entrena las 9 arquitecturas evaluadas en el
+proyecto (Persistencia no necesita entrenamiento: tiene 0 parámetros y
+ya se calcula en 07_baseline_persistencia.py).
 
-No existía como .py — solo como notebook (07_modelos_final.ipynb, cuyo
-nombre no coincide con el "08_modelos_final.ipynb" que cita la memoria;
-revisar y corregir la numeración en el Anexo 1). Este script reproduce
-EXACTAMENTE los hiperparámetros por modelo que aparecen en ese notebook
-(batch_size y epochs no son iguales para todos — la memoria solo da los
-hiperparámetros generales del optimizador/scheduler, no éstos):
+Los hiperparámetros de entrenamiento (optimizador, scheduler, gradient
+clipping) son comunes a todos los modelos y viven en
+modelos/entrenamiento.py. batch_size y nº de epochs sí varían por
+arquitectura:
 
     modelo             batch_size  epochs
     mlp_simple                 32      10
@@ -21,25 +19,15 @@ hiperparámetros generales del optimizador/scheduler, no éstos):
     gat_plus                    16      12
     gat_ultra                   16      12
 
-IMPORTANTE — reproducibilidad: el notebook original no fija ninguna
-semilla (`torch.manual_seed`, etc.), así que los resultados de esta
-ejecución NO serán bit-idénticos a los publicados aunque el código sea
-exacto — solo deberían estar en el mismo orden de magnitud (el propio
-07_baseline_persistencia.py ya avisa de esto para la persistencia: ~2%
-de margen en la Tabla 11.2 de la memoria). Grandes desviaciones (>5-10%)
-sí serían señal de un problema real en el pipeline, no de aleatoriedad.
-
-IMPORTANTE — dónde se guardan los checkpoints: este script usa
-config.MODELS_DIR TAL CUAL (pipeline_v2_recon/models), sin el override a
-pipeline_v2/models que hacen hoy 09_analisis_temporal.py y
-10_ensembles.py. Esto es intencional: los checkpoints viejos (pipeline_v2)
-se entrenaron con una versión distinta de los tensores (ver hallazgo de
-la revisión a fondo — Y_lag24.npy vs Y_lag24_log.npy) y no deben mezclarse
-con los tensores nuevos. Una vez termine este script, hay que quitar el
-override de 09/10 para que usen estos checkpoints nuevos.
+Nota sobre reproducibilidad: no se fija ninguna semilla aleatoria
+(`torch.manual_seed`, etc.), así que dos ejecuciones no dan resultados
+bit-idénticos — es esperable una variación de hasta un par de puntos
+porcentuales entre runs. Una desviación mucho mayor (>5-10%) sí sería
+indicio de un problema en el pipeline de datos, no de aleatoriedad del
+entrenamiento.
 
 Requiere: 05_pipeline_tensores.py y 06_grafo_enriquecido.py ya ejecutados.
-Genera: pipeline_v2_recon/models/*.pt (9 checkpoints) + resultados/entrenamiento.json
+Genera: models/*.pt (9 checkpoints) + resultados/entrenamiento.json
 """
 
 import json
@@ -78,10 +66,11 @@ CONFIGURACIONES = [
          con_ventana=True, grafo='fisico', batch_size=16, epochs=12),
 ]
 
-# Cifras publicadas en la memoria (apartado 5.7) — solo para comparar al
-# final, no se usan en el entrenamiento. gat_enriched no tiene fila propia
-# en la Tabla 5.7 (solo se usa para el ensemble de la sección 10).
-ESPERADO_MEMORIA = {
+# Valores de referencia obtenidos previamente para cada arquitectura,
+# usados solo para comparar al final (no intervienen en el entrenamiento).
+# gat_enriched no tiene entrada propia porque solo se usa en el ensemble
+# de 10_ensembles.py, no se reporta como modelo individual.
+RESULTADOS_REFERENCIA = {
     'mlp_simple': 35.55, 'mlp_completo': 34.20, 'gcn_simple_v2': 33.12,
     'gcn_completo_v2': 30.68, 'gcn_completo_big': 30.73,
     'gat_completo': 28.50, 'gat_plus': 28.35, 'gat_ultra': 29.60,
@@ -108,8 +97,7 @@ def main():
         print(f'  {s}: X={d["X"].shape}')
 
     persistencia_test_mae, _ = persistencia_mae(data['test']['Y'], data['test']['M'], horizon=HORIZON)
-    print(f'\nPersistencia (test): {persistencia_test_mae:.2f} veh/h '
-          f'(memoria: 37.55 — margen ~2% es normal, ver Tabla 11.2)')
+    print(f'\nPersistencia (test): {persistencia_test_mae:.2f} veh/h')
 
     resultados = {}
     for cfg in CONFIGURACIONES:
@@ -147,14 +135,14 @@ def main():
     print('\n\n' + '=' * 70)
     print('RESUMEN FINAL')
     print('=' * 70)
-    print(f'\n  {"Modelo":<20} {"MAE":>8} {"RMSE":>8} {"Memoria":>10} {"Δ":>8}')
+    print(f'\n  {"Modelo":<20} {"MAE":>8} {"RMSE":>8} {"Referencia":>10} {"Δ":>8}')
     print('  ' + '-' * 58)
     for nombre, r in resultados.items():
-        memo = ESPERADO_MEMORIA.get(nombre)
-        if memo is not None:
-            diff = r['mae_real'] - memo
-            marca = f'{memo:>10.2f} {diff:>+7.2f}'
-            if abs(diff) / memo > 0.10:
+        ref = RESULTADOS_REFERENCIA.get(nombre)
+        if ref is not None:
+            diff = r['mae_real'] - ref
+            marca = f'{ref:>10.2f} {diff:>+7.2f}'
+            if abs(diff) / ref > 0.10:
                 marca += '  ⚠️ desviación >10%'
         else:
             marca = f'{"—":>10} {"—":>8}'
