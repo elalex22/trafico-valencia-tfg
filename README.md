@@ -1,5 +1,8 @@
 # Pipeline de predicción de tráfico — Valencia Smart City
 
+**Autor:** Alejandro Navarro del Castillo
+**Trabajo de Fin de Grado — Grado en Ciencia de Datos, Universitat Politècnica de València**
+
 Pipeline de 10 scripts que va desde la extracción de datos brutos hasta el
 entrenamiento y evaluación de 9 arquitecturas de red neuronal para predecir
 intensidad de tráfico a 15 minutos vista. Corresponde a la Tabla 11.1 (Anexo
@@ -114,20 +117,19 @@ python 10_ensembles.py
 ```
 
 Cada script comprueba y avisa (⚠️) si algún resultado suyo no coincide con
-las cifras publicadas en la memoria (nº de nodos, tamaño de splits,
-parámetros por arquitectura, MAE de persistencia...) — revisa esos avisos
-antes de pasar al siguiente script si aparece alguno.
+los valores esperados (nº de nodos, tamaño de splits, parámetros por
+arquitectura, MAE de persistencia...) — revisa esos avisos antes de pasar
+al siguiente script si aparece alguno.
 
 ## 6. Notas conocidas
 
-- **`08` no fija semilla aleatoria** (el notebook original tampoco lo hacía)
-  — espera variaciones de ~1-3% entre ejecuciones, no resultados idénticos.
+- **`08` no fija semilla aleatoria** — espera variaciones de ~1-3% entre
+  ejecuciones, no resultados idénticos.
 - **`06` es sensible a `UMBRAL_CORR`/`K_MAX_CORR`**: al estar el umbral
   (0.7) en zona densa de la distribución de correlaciones, pequeñísimas
   diferencias numéricas pueden mover el nº de aristas por correlación un
   par de puntos porcentuales — no indica un error si el resto de cifras
   cuadra.
 - **Ruido**: la corrección de coordenadas corruptas en `01` está activa
-  pero, en la última ejecución verificada, no encontró ningún caso — el
-  apartado 4.3 de la memoria puede necesitar revisión si esto se repite
-  siempre.
+  por si aparece algún registro con el formato corrupto descrito (más de
+  un punto decimal), aunque en la práctica no siempre se encuentran casos.
