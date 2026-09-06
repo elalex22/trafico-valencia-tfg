@@ -1,0 +1,17 @@
+{
+  "n_nodos": 1035,
+  "features_dinamicas": [
+    "estado", "mask_estado", "tmed", "prec", "mask_meteo",
+    "hora_sin", "hora_cos", "minuto_sin", "minuto_cos",
+    "dia_semana_sin", "dia_semana_cos",
+    "es_finde", "es_festivo", "es_fallas",
+    "ih_bici", "mask_ih_bici", "available", "free", "mask_valenbici",
+    "laeq", "laeq_n", "mask_ruido"
+  ],
+  "features_estaticas": ["lat", "lon"],
+  "target": "ih_trafico",
+  "mask": "mask_valid",
+  "transform": "log1p",
+  "inverse": "expm1",
+  "lags": {"lag24": 96, "lag7d": 672}
+}
