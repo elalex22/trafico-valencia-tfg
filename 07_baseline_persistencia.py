@@ -29,8 +29,8 @@ def main():
         json.dump(resultados, f, indent=2)
 
     print(f'\n  Guardado: resultados/baseline.json')
-    print(f'\n  ⚠️ Verifica: test.mae_real debería salir ≈ 37.55 veh/h.')
-    print(f'     Si no coincide, algo cambió en 04/05 respecto al pipeline real — revisar antes de seguir.')
+    print(f'\n  Nota: el MAE de persistencia en test debería rondar los 37-38 veh/h.')
+    print(f'  Una desviación grande respecto a ese rango indicaría revisar 04/05.')
 
 
 if __name__ == '__main__':
