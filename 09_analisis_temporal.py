@@ -2,20 +2,8 @@
 09_analisis_temporal.py — GAT+Plus vs persistencia: por franja horaria,
 por hora y por día de la semana. Split: test.
 
-── CAMBIOS respecto a la versión anterior, tras revisión a fondo ──
-1. Se QUITA el override `config.MODELS_DIR = ... pipeline_v2 / 'models'`.
-   Ya no hace falta: 08_entrenar_modelos.py deja los checkpoints nuevos
-   en pipeline_v2_recon/models (config.MODELS_DIR por defecto), que es
-   justo lo que este script debe usar — mezclar checkpoints viejos con
-   tensores nuevos fue el problema de fondo detectado en la revisión.
-2. FRANJAS corregidas: la versión anterior usaba 4 franjas adivinadas
-   (madrugada/mañana/tarde/noche) que NO coincidían con las 6 franjas
-   reales encontradas en 07_modelos_final.ipynb (celda #24):
-   madrugada (0-6h), punta_mañana (6-10h), valle_mediodía (10-14h),
-   tarde (14-17h), punta_tarde (17-20h), noche (20-24h).
-
 Requiere: 08_entrenar_modelos.py ya ejecutado (necesita gat_plus.pt en
-pipeline_v2_recon/models).
+models/).
 Genera: resultados/analisis_temporal.json
 """
 import json
@@ -26,7 +14,7 @@ import torch
 from config import TENSOR_DIR, RESULTADOS_DIR
 from modelos.inferencia import predecir_modelo
 
-# ── Franjas horarias — idénticas a 07_modelos_final.ipynb, celda #24 ──
+# ── Franjas horarias del día ──
 FRANJAS = {
     'madrugada': range(0, 6),
     'punta_manana': range(6, 10),
