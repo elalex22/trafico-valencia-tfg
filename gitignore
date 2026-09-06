@@ -1,0 +1,52 @@
+# ── Datos brutos (varios GB, no versionar — ver README para las fuentes) ──
+estat_trafic_VLC-main/
+espires_VLC2-main/
+espires_bici_VLC-main/
+valenbici-master/
+datos_tiempo/
+fusion_ruido_sensores/
+2023-24/
+
+# ── Salida generada por el pipeline (regenerable con 01→10) ──
+pipeline_v2/
+pipeline_v2_recon/
+pipeline_v2_recon_backup*/
+
+# ── Restos/duplicados encontrados en la revisión a fondo — no subir ──
+codigos_finales/
+1_limpieza.py
+2_asignaciones.py
+3_pipeline_A.py
+4_pipeline_B.py
+5_pipeline_final.py
+6_limpieza_final.py
+7_pipeline_definitivo.py
+modelos/10_ensembles.py
+modelos/rgistrp.py
+
+# ── Notebooks de exploración vieja / figuras auxiliares (opcional) ──
+*.ipynb_checkpoints/
+figuras_tfg/
+
+# ── Python estándar ──
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# ── Entorno / capturas locales ──
+entorno_real.txt
+inventario_resultado.txt
+*_resultado.txt
+
+# ── Checkpoints y tensores pesados (usa Release de GitHub o Git LFS si quieres versionarlos) ──
+*.pt
+*.pth
+*.npy
+*.parquet
+
+# ── Sistema ──
+.DS_Store
+Thumbs.db

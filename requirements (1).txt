@@ -1,0 +1,33 @@
+# requirements.txt — versiones EXACTAS capturadas de tu entorno real
+# (capturar_entorno.py, Python 3.10.8), no rangos deducidos.
+#
+# Nota honesta: la versión anterior de este archivo decía "numpy<2.0
+# porque torch de esta época suele fijarlo" — era una suposición sin
+# verificar, y era incorrecta: tienes numpy 2.2.6 con torch 2.13.0 sin
+# ningún problema. Queda como recordatorio de por qué este archivo ahora
+# usa tus cifras reales en vez de deducciones.
+
+# --- Datos y E/S ---
+pandas==2.3.3
+numpy==2.2.6
+pyarrow==25.0.0
+scipy==1.15.3
+
+# --- Grafo y calendario ---
+networkx==3.4.2
+osmnx==2.0.7
+holidays==0.101
+
+# --- Deep learning ---
+# Instalar siguiendo el selector oficial (depende de tu CUDA):
+# https://pytorch.org/get-started/locally/
+torch==2.13.0
+
+# Instalar siguiendo la matriz de compatibilidad oficial de PyG:
+# https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html
+torch-geometric==2.8.0.post1
+
+# torch-scatter / torch-sparse / torch-cluster: NO instalados en tu
+# entorno y el pipeline funciona igualmente — torch-geometric 2.8 no los
+# necesita para GATConv/GCNConv en el uso que hace modelos/arquitecturas.py.
+# No los añadas salvo que algún import falle explícitamente.
