@@ -2,15 +2,8 @@
 10_ensembles.py — 4 estrategias de ensemble sobre test:
   oracle por día · promedio 3 GAT · oracle por hora · oracle hora×día.
 
-── CAMBIO respecto a la versión anterior, tras revisión a fondo ──
-Se QUITA el override `config.MODELS_DIR = ... pipeline_v2 / 'models'`.
-Ya no hace falta: 08_entrenar_modelos.py deja los checkpoints nuevos en
-pipeline_v2_recon/models (config.MODELS_DIR por defecto) — mezclar
-checkpoints viejos con tensores nuevos fue el problema de fondo
-detectado en la revisión (ver Y_lag24.npy vs Y_lag24_log.npy).
-
 Requiere: 08_entrenar_modelos.py ya ejecutado (necesita gat_plus.pt,
-gat_completo.pt, gat_enriched.pt en pipeline_v2_recon/models).
+gat_completo.pt, gat_enriched.pt en models/).
 Genera: resultados/ensembles.json
 """
 import json
@@ -65,38 +58,39 @@ def main():
 
     mae_plus = mae_enmascarado(alineados['gat_plus'][0], y_ref, m_ref)
     resultados['gat_plus_individual'] = mae_plus
-    print(f'\n[2] GAT+Plus individual: {mae_plus:.2f} veh/h (memoria: 28.35)')
+    print(f'\n[2] GAT+Plus individual: {mae_plus:.2f} veh/h (referencia: 28.35)')
 
     print('\n[3] Oracle por día...')
     grupo_dia = {d: (dias == d) for d in range(7)}
     pred_od, mejor_dia = oracle_por_grupo(alineados, y_ref, m_ref, grupo_dia)
     resultados['oracle_dia'] = mae_enmascarado(pred_od, y_ref, m_ref)
     print(f'  {mejor_dia}')
-    print(f'  MAE: {resultados["oracle_dia"]:.2f} veh/h (memoria: 28.27)')
+    print(f'  MAE: {resultados["oracle_dia"]:.2f} veh/h (referencia: 28.27)')
 
     print('\n[4] Promedio de 3 GAT...')
     pred_prom = np.mean([alineados[n][0] for n in GATS_PARA_PROMEDIO], axis=0)
     resultados['promedio_3gat'] = mae_enmascarado(pred_prom, y_ref, m_ref)
-    print(f'  MAE: {resultados["promedio_3gat"]:.2f} veh/h (memoria: 27.94)')
+    print(f'  MAE: {resultados["promedio_3gat"]:.2f} veh/h (referencia: 27.94)')
 
     print('\n[5] Oracle por hora...')
     grupo_hora = {h: (horas == h) for h in range(24)}
     pred_oh, mejor_hora = oracle_por_grupo(alineados, y_ref, m_ref, grupo_hora)
     resultados['oracle_hora'] = mae_enmascarado(pred_oh, y_ref, m_ref)
-    print(f'  MAE: {resultados["oracle_hora"]:.2f} veh/h (memoria: 27.85)')
+    print(f'  MAE: {resultados["oracle_hora"]:.2f} veh/h (referencia: 27.85)')
 
     print('\n[6] Oracle por hora × día (168 celdas)...')
     grupo_hd = {(h, d): (horas == h) & (dias == d) for h in range(24) for d in range(7)}
     pred_ohd, mejor_hd = oracle_por_grupo(alineados, y_ref, m_ref, grupo_hd)
     resultados['oracle_hora_dia'] = mae_enmascarado(pred_ohd, y_ref, m_ref)
-    print(f'  MAE: {resultados["oracle_hora_dia"]:.2f} veh/h (memoria: 27.63)')
+    print(f'  MAE: {resultados["oracle_hora_dia"]:.2f} veh/h (referencia: 27.63)')
 
     conteo = {}
     for modelo in mejor_hd.values():
         conteo[modelo] = conteo.get(modelo, 0) + 1
     print(f'\n  Reparto de victorias (168 celdas): {conteo}')
-    print('  ⚠️ Esto NO es directamente comparable al reparto "por hora agregada"')
-    print('     de la memoria — son dos análisis de granularidad distinta.')
+    print('  Nota: este reparto celda a celda (hora×día) no es directamente')
+    print('  comparable con un reparto agregado solo por hora — son dos')
+    print('  análisis de granularidad distinta.')
 
     with open(RESULTADOS_DIR / 'ensembles.json', 'w') as f:
         json.dump({**resultados, 'reparto_victorias_hd': conteo}, f, indent=2, default=str)
