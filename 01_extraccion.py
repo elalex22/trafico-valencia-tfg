@@ -12,36 +12,24 @@ Fuentes:
 Ejecutar con el kernel/entorno limpio (los writers de parquet no toleran
 archivos parcialmente escritos de una ejecución anterior).
 
-── CAMBIOS respecto a la versión original, alineados con el código real
-   confirmado en 04_fusion_master.py / datos/utils_datos.py ──
+Notas de implementación:
 
-1. Meteorología:
-   - El sufijo "Ip" se ELIMINA explícitamente (`.replace('Ip', '')`) en
-     vez de sustituirse por "0" (que daba el resultado correcto por
-     coincidencia, pero de forma frágil — verificado en sandbox).
-   - Conversión explícita a `float32` (antes quedaba en `float64`).
-   - Validación de rango: descarta (NaN) temperaturas fuera de
-     [-10, 50]°C y precipitaciones negativas. No existe en ningún otro
-     script del pipeline real, así que es un hueco genuino que se cierra
-     aquí, sin conflicto con nada downstream.
+- Meteorología (AEMET): el sufijo "Ip" que aparece en algunos registros
+  corruptos se elimina explícitamente antes de convertir a numérico;
+  los valores se guardan en float32. Se descartan (quedan como NaN)
+  temperaturas fuera de [-10, 50]°C y precipitaciones negativas.
 
-2. Ruido: se aplica `fix_corrupt_coord()` a lat/lon en origen. Tampoco
-   existe en ningún otro script real, y `03_asignaciones_espaciales.py`
-   consume estas coordenadas directamente para el cKDTree, así que este
-   es el sitio correcto para corregirlas.
+- Ruido: las coordenadas con formato corrupto (más de un punto decimal,
+  p. ej. "394.631.424" en vez de "39.4631424") se corrigen aquí, ya que
+  03_asignaciones_espaciales.py las usa directamente para el cKDTree que
+  asigna cada espira al sensor de ruido más cercano.
 
-NOTA — revertido tras revisión a fondo: una versión anterior de este
-script añadía `clip(lower=0)` + máscara para los -1 de ih_trafico/ih_bici,
-y convertía id_sensor/id_estacion a string vía normalize_id. Ambos
-cambios se han revertido:
-  - El clip rompía la limpieza real de -1 que ya existe en
-    04_fusion_master.py (rachas de ceros) y 05_pipeline_tensores.py
-    (limpiar_y_log, que detecta Y==-1 explícitamente — necesita el
-    valor crudo intacto para funcionar).
-  - 04_fusion_master.py real NUNCA renormaliza id_sensor/id_estacion
-    (solo id_tramo, vía normalize_id) — asume que llegan como int64
-    consistentes, tal y como hacía el 01_extraccion.py original.
-    Convertirlos a string era una convención paralela innecesaria.
+- `ih_trafico` / `ih_bici` se guardan con su valor crudo (incluyendo -1
+  para fallos de sensor) e `id_sensor` / `id_estacion` como `int64`. La
+  limpieza de -1 y outliers del target se hace más adelante, en
+  `04_fusion_master.py` (rachas largas de cero) y `05_pipeline_tensores.py`
+  (límite de -1/outliers antes del log1p), que necesitan el valor
+  original intacto para poder detectarlo.
 """
 
 import re
@@ -87,13 +75,13 @@ def limpiar_processed():
 # 04_fusion_master.py para id_tramo). No se duplica aquí porque este
 # script ya no la necesita: id_tramo se guarda como string simple
 # (04 la renormaliza igualmente al cargarla) e id_sensor/id_estacion se
-# mantienen como int64, igual que el pipeline real.
+# mantienen como int64.
 # ══════════════════════════════════════════════════════════════
 
 # ══════════════════════════════════════════════════════════════
-# Corrección de coordenadas corruptas (apartado 4.3: ej. ruido,
-# "394.631.424" -> "39.4631424"). Solo transforma strings con más de
-# un punto decimal; un valor normal (0 o 1 puntos) se devuelve tal cual.
+# Corrección de coordenadas corruptas (ej. ruido, con formato
+# "394.631.424" en vez de "39.4631424"). Solo transforma strings con más
+# de un punto decimal; un valor normal (0 o 1 puntos) se devuelve tal cual.
 # ══════════════════════════════════════════════════════════════
 def fix_corrupt_coord(value, integer_digits):
     s = str(value).strip()
@@ -425,16 +413,16 @@ def extraer_meteo():
     df_meteo['fecha'] = pd.to_datetime(df_meteo['fecha'])
 
     for col in ['tmed', 'prec', 'tmin', 'tmax', 'sol']:
-        # Eliminar (no sustituir) el sufijo corrupto "Ip", tal y como
-        # describe la memoria; luego convertir a float32 explícitamente.
+        # Eliminar (no sustituir) el sufijo corrupto "Ip" que aparece en
+        # algunos registros; luego convertir a float32 explícitamente.
         limpio = df_meteo[col].str.replace('Ip', '', regex=False)
         df_meteo[col] = pd.to_numeric(limpio, errors='coerce').astype('float32')
 
     df_meteo = df_meteo.dropna(subset=['fecha']).drop_duplicates(subset='fecha').sort_values('fecha')
 
-    # ── Validación de rango (apartado 4.3): descarta >50°C o <-10°C,
-    # precipitaciones negativas. Se descarta el valor puntual (NaN), no
-    # la fila entera, para no perder el resto de variables de ese día. ──
+    # ── Validación de rango: descarta >50°C o <-10°C, precipitaciones
+    # negativas. Se descarta el valor puntual (NaN), no la fila entera,
+    # para no perder el resto de variables de ese día. ──
     for col in ['tmed', 'tmin', 'tmax']:
         fuera_rango = df_meteo[col].notna() & ~df_meteo[col].between(-10, 50)
         if fuera_rango.any():
@@ -475,17 +463,14 @@ def extraer_ruido():
 
     df_ruido = pd.concat(frames, ignore_index=True).sort_values('timestamp')
 
-    # ── Corrección de coordenadas corruptas (apartado 4.3), aplicada en
-    # origen. fix_corrupt_coord() solo altera valores con más de un punto
-    # decimal (claramente corruptos); el resto pasa sin cambios. ──
+    # ── Corrección de coordenadas corruptas, aplicada en origen.
+    # fix_corrupt_coord() solo altera valores con más de un punto decimal
+    # (claramente corruptos); el resto pasa sin cambios. ──
     n_lat_corruptas = df_ruido['lat'].astype(str).str.count(r'\.').gt(1).sum()
     n_lon_corruptas = df_ruido['lon'].astype(str).str.count(r'\.').gt(1).sum()
     df_ruido['lat'] = df_ruido['lat'].apply(lambda v: fix_corrupt_coord(v, integer_digits=2))
     df_ruido['lon'] = df_ruido['lon'].apply(lambda v: fix_corrupt_coord(v, integer_digits=1))
     print(f'  Coordenadas corruptas corregidas: {n_lat_corruptas} en lat, {n_lon_corruptas} en lon')
-    if n_lat_corruptas == 0 and n_lon_corruptas == 0:
-        print(f'  ℹ️ No se detectó ningún caso de corrupción en esta ejecución — '
-              f'si esto se repite siempre, considerar borrar la afirmación del apartado 4.3.')
 
     df_ruido = df_ruido.dropna(subset=['lat', 'lon'])
     df_ruido.to_parquet(PROC / 'ruido.parquet', index=False)
@@ -521,7 +506,7 @@ def verificar():
             col, esperado = esperado_sensores[nombre]
             real = df[col].nunique()
             marca = '✓' if real == esperado else '⚠️'
-            print(f'     {marca} sensores únicos: {real} (memoria Tabla 4.1: {esperado})')
+            print(f'     {marca} sensores únicos: {real} (esperado: {esperado})')
         del df
     gc.collect()
 
