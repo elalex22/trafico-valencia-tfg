@@ -4,8 +4,7 @@
 asignación espira→tramo (para la feature 'estado' de estat_trafic).
 
 Requiere: 01_extraccion.py ya ejecutado (usa espires_trafico.parquet para
-filtrar espiras "vivas"; id_sensor llega como int64, igual que el resto
-del pipeline real).
+filtrar espiras "vivas"; id_sensor llega como int64).
 
 Genera:
   - grafo/valencia_drive.graphml
@@ -17,23 +16,20 @@ Genera:
   - eda_grafo/coords_tramos_estat_v2.csv
   - grafo/espira_to_tramo.csv
 
-── CAMBIOS respecto a la versión anterior, para que coincida con lo
-   descrito en la memoria ──
+Notas de implementación:
 
-1. CORRECCIÓN DE SESGO GEOGRÁFICO en la distancia de map-matching
-   (`filtrar_vivas_y_mapmatch`). Antes: `pt.distance(geom) * 111_320`,
-   igual para lat y lon. A la latitud de Valencia (39,47°N) eso
-   sobreestima ~29,5% las distancias con componente este-oeste
-   (verificado en sandbox). Ahora se proyecta el punto y la geometría a
-   un plano local en metros (escalando la longitud por cos(lat_ref))
-   antes de calcular la distancia — corrige tanto el número reportado
-   como, potencialmente, qué arista se elige como "más cercana" en casos
-   límite.
-2. Verificaciones explícitas contra la Tabla 5.1 de la memoria: nº de
-   nodos (1.035), aristas no dirigidas (2.863), grado medio (5,5),
-   componentes conexos (1), tramos viarios cubiertos (295) y espiras
-   medias por tramo (3,5). Si el pipeline real da otra cifra, se imprime
-   un aviso explícito en vez de quedar solo en el log genérico.
+- La distancia de map-matching (`filtrar_vivas_y_mapmatch`) se calcula
+  proyectando el punto y la geometría a un plano local en metros
+  (escalando la longitud por cos(lat_ref)) antes de medir la distancia,
+  en vez de aplicar el mismo factor de conversión a latitud y longitud.
+  A la latitud de Valencia (39,47°N), tratar 1° de longitud como 111.320 m
+  (el valor correcto solo para latitud) sobreestima en torno a un 29,5%
+  las distancias con componente este-oeste.
+
+- Varias funciones imprimen una comparación contra los valores esperados
+  del grafo (nº de nodos, aristas, grado medio, componentes conexos,
+  tramos cubiertos) como comprobación de sanidad rápida al ejecutar el
+  script sobre datos nuevos.
 """
 
 import time
@@ -136,8 +132,8 @@ def extraer_coords_espiras():
 # ══════════════════════════════════════════════════════════════
 def filtrar_vivas_y_mapmatch(G, df_coords):
     df_esp = pd.read_parquet(PROC / 'espires_trafico.parquet')
-    # id_sensor llega como int64 desde 01_extraccion.py (igual que el
-    # pipeline real). Cast defensivo sin efecto si ya es int.
+    # id_sensor llega como int64 desde 01_extraccion.py.
+    # Cast defensivo sin efecto si ya es int.
     df_esp['id_sensor'] = df_esp['id_sensor'].astype(int)
 
     cob = df_esp.groupby('id_sensor').agg(
@@ -178,8 +174,6 @@ def filtrar_vivas_y_mapmatch(G, df_coords):
     p99 = np.percentile(distances, 99)
     print(f'    Dist. mediana: {mediana:.1f}m | P99: {p99:.1f}m | '
           f'>100m: {sum(1 for d in distances if d > 100)}')
-    print(f'    (memoria Tabla 11.2: mediana 1,1m, P99 7,7m, 0 espiras >100m — '
-          f'comparar tras corrección de sesgo geográfico)')
     return df_vivas, df_coords
 
 
@@ -191,8 +185,8 @@ def guardar_node_order(df_vivas, df_coords):
     node_order.to_csv(GRAPH_DIR / 'node_order_1035.csv', index=False)
     print(f'  Guardado: node_order_1035.csv ({n} nodos)')
     if n != 1035:
-        print(f'  ⚠️ Memoria (Tabla 5.1) declara 1.035 nodos; el pipeline real da {n}. '
-              f'Actualizar la memoria o revisar el filtro de espiras "vivas".')
+        print(f'  ⚠️ Se esperaban 1.035 nodos y se obtuvieron {n}. '
+              f'Revisar el filtro de espiras "vivas".')
     return node_order
 
 
@@ -327,19 +321,19 @@ def construir_grafo_definitivo(G_dir):
     print(f'  Aislados: {int((grado == 0).sum())} | Componentes: {len(comps)} | '
           f'Componente principal: {max(len(c) for c in comps)} nodos')
 
-    # ── Comparación explícita con la memoria (Tabla 5.1) ──
+    # ── Comprobación de sanidad contra los valores esperados del grafo ──
     if len(aristas) != 2863:
-        print(f'  ⚠️ Memoria declara 2.863 aristas no dirigidas; pipeline real da {len(aristas)}.')
+        print(f'  ⚠️ Se esperaban 2.863 aristas no dirigidas y se obtuvieron {len(aristas)}.')
     if abs(grado.mean() - 5.5) > 0.1:
-        print(f'  ⚠️ Memoria declara grado medio 5,5; pipeline real da {grado.mean():.2f}.')
+        print(f'  ⚠️ Se esperaba un grado medio de 5,5 y se obtuvo {grado.mean():.2f}.')
     if len(comps) != 1:
-        print(f'  ⚠️ Memoria declara 1 componente conexo; pipeline real da {len(comps)}.')
+        print(f'  ⚠️ Se esperaba 1 único componente conexo y se obtuvieron {len(comps)}.')
 
     np.save(GRAPH_DIR / 'adj_final.npy', A)
     src, dst = np.where(A > 0)
     np.save(GRAPH_DIR / 'edge_index_final.npy', np.stack([src, dst]).astype(np.int64))
     print(f'  Guardado: adj_final.npy, edge_index_final.npy '
-          f'({len(src)} aristas dirigidas; memoria Tabla 5.1: 5.726)')
+          f'({len(src)} aristas dirigidas)')
 
     return aristas_secuencial, aristas_calle
 
@@ -466,14 +460,13 @@ def asignar_espira_a_tramo(G, df_tramos):
     df_asig.to_csv(GRAPH_DIR / 'espira_to_tramo.csv', index=False)
     print(f'  Guardado: espira_to_tramo.csv ({len(df_asig)} espiras)')
 
-    # ── Métricas de la Tabla 5.1 que faltaban: tramos cubiertos y
-    # espiras medias por tramo ──
+    # ── Tramos viarios cubiertos y espiras medias por tramo ──
     n_tramos_cubiertos = df_asig['id_tramo'].nunique()
     espiras_por_tramo = len(df_asig) / n_tramos_cubiertos if n_tramos_cubiertos else float('nan')
-    print(f'  Tramos viarios cubiertos: {n_tramos_cubiertos} (memoria Tabla 5.1: 295)')
-    print(f'  Espiras medias por tramo: {espiras_por_tramo:.1f} (memoria Tabla 5.1: 3,5)')
+    print(f'  Tramos viarios cubiertos: {n_tramos_cubiertos} (esperado: 295)')
+    print(f'  Espiras medias por tramo: {espiras_por_tramo:.1f} (esperado: 3,5)')
     if n_tramos_cubiertos != 295:
-        print(f'  ⚠️ Discrepancia con la memoria en nº de tramos cubiertos.')
+        print(f'  ⚠️ El nº de tramos cubiertos no coincide con el valor esperado.')
 
     return df_asig
 
