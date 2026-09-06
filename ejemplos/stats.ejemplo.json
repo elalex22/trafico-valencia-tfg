@@ -1,0 +1,22 @@
+{
+  "x_features": {
+    "estado":    {"idx": 0,  "mean": 0.266,  "std": 1.114,  "n_valid": 42764759},
+    "tmed":      {"idx": 2,  "mean": 19.758, "std": 4.998,  "n_valid": 43946100},
+    "prec":      {"idx": 3,  "mean": 0.753,  "std": 4.538,  "n_valid": 43946100},
+    "ih_bici":   {"idx": 14, "mean": 16.104, "std": 62.244, "n_valid": 33419798},
+    "available": {"idx": 16, "mean": 8.453,  "std": 6.222,  "n_valid": 37688436},
+    "free":      {"idx": 17, "mean": 10.406, "std": 7.007,  "n_valid": 37688436},
+    "laeq":      {"idx": 19, "mean": 60.551, "std": 5.544,  "n_valid": 431489},
+    "laeq_n":    {"idx": 20, "mean": 55.594, "std": 6.481,  "n_valid": 431489}
+  },
+  "y": {
+    "mean_log": 3.50,
+    "std_log": 1.20,
+    "min_log": 0.0,
+    "max_log": 8.52
+  },
+  "cleaning": {
+    "valid_range": [0, 5000],
+    "excluded": ["ih_trafico == -1", "ih_trafico > 5000", "ih_trafico < -1"]
+  }
+}
