@@ -1,0 +1,35 @@
+# .dockerignore — lista blanca: se excluye todo y solo entra en el
+# contexto de construcción lo que copia el Dockerfile.
+*
+
+!Dockerfile
+!requirements-app.txt
+!app/app.py
+!app/inferencia_demo.py
+!modelos/__init__.py
+!modelos/arquitecturas.py
+!modelos/datasets.py
+!pipeline_v2_recon/demo/
+!pipeline_v2_recon/models/gat_plus.pt
+
+# ── Exclusiones explícitas (ya cubiertas por '*'; quedan documentadas y
+# protegen si alguien amplía la lista blanca) ──
+# Uniones (junctions) a los datos brutos: nunca entran en el contexto.
+estat_trafic_VLC-main
+espires_VLC2-main
+espires_bici_VLC-main
+valenbici-master
+datos_tiempo
+fusion_ruido_sensores
+# Entorno, git, cachés y tests
+.venv/
+.git/
+cache/
+tests/
+**/__pycache__/
+**/.pytest_cache/
+# Datos completos del pipeline
+pipeline_v2_recon/data/
+# Pesos: solo gat_plus.pt (gana la última regla que coincide)
+pipeline_v2_recon/models/*.pt
+!pipeline_v2_recon/models/gat_plus.pt
