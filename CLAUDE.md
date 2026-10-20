@@ -46,6 +46,11 @@
   cada una un .npz comprimido en float32 con 692 pasos × 1035 nodos (672
   de la semana + 20 de contexto para gat_plus), más node_order.csv,
   edge_index_final.npy, stats.json y config.json.
+- La app (app/app.py) solo usa los instantes :15 (la intensidad es horaria
+  y cambia a y cuarto) y lee predicciones_<semana>.npz, que genera
+  app/precalcular_predicciones.py; si cambia la muestra o el modelo, hay
+  que volver a ejecutarlo. Mapa con teselas de OpenStreetMap (CartoDB pide
+  clave). Sensores sin datos en gris.
 - Dependencias de la demo en requirements-app.txt; en Docker, torch en
   versión solo CPU.
 - Python con tipado en las funciones nuevas y docstrings en español.
