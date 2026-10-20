@@ -13,7 +13,7 @@
   reconocidos por el portal y excluidos de los splits (memoria, p. 31 y 37).
 - Del 1 al 12 de junio de 2025 la fuente estuvo congelada (11,3 días con
   valores repetidos, alrededor del 10 % del test); las métricas lo
-  incluyen, igual que en la memoria.
+  incluyen.
 - Modelo de la demo: gat_plus.pt (GAT+Plus), el mismo que usan
   09_analisis_temporal.py y 10_ensembles.py.
 
