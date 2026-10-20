@@ -34,7 +34,8 @@
   que recibe una sola ventana. Tests en tests/.
 - Muestra de la demo en pipeline_v2_recon/demo/ (la genera
   app/crear_muestra_demo.py): dos semanas de test, semana_normal.npz
-  (2–8 de junio de 2025) y semana_san_juan.npz (23–29 de junio de 2025),
+  (15–21 de septiembre de 2025) y semana_san_juan.npz (23–29 de junio de
+  2025; el domingo 29 no hay datos de tráfico desde las 9:00),
   cada una un .npz comprimido en float32 con 692 pasos × 1035 nodos (672
   de la semana + 20 de contexto para gat_plus), más node_order.csv,
   edge_index_final.npy, stats.json y config.json.
