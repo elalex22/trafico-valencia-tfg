@@ -47,9 +47,9 @@
 
 ## Entorno
 - Windows con PowerShell.
-- Python del .venv de la raíz.
-- Los scripts 01–10 se ejecutan con Python 3.10 y requirements.txt (el
-  entorno del TFG); el .venv es para la demo.
+- Todo (scripts 01–10, demo y tests) se ejecuta con .venv\Scripts\python.exe,
+  un .venv de Python 3.10 (el del TFG) con requirements.txt,
+  requirements-app.txt y requirements-dev.txt.
 - Ejecutar siempre desde la raíz del repositorio (RAIZ = '.' en config.py).
 - Avast intercepta HTTPS en este equipo: si falla alguna descarga por
   certificados, avisar en lugar de desactivar la verificación.
