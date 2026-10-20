@@ -29,8 +29,9 @@ def test_instantes_cuarto(guardado) -> None:
 
 def test_formas_y_tipos(guardado) -> None:
     _, p = guardado
-    assert p['prediccion'].shape == p['real'].shape == (168, 1035)
-    assert p['prediccion'].dtype == p['real'].dtype == np.float32
+    assert p['prediccion'].shape == p['real'].shape == p['persistencia'].shape == (168, 1035)
+    assert p['prediccion'].dtype == p['real'].dtype == p['persistencia'].dtype == np.float32
+    assert not np.isnan(p['persistencia']).any() and (p['persistencia'] >= 0).all()
     assert p['verificable'].dtype == bool
     assert not np.isnan(p['prediccion']).any() and (p['prediccion'] >= 0).all()
 

@@ -6,7 +6,8 @@ import torch
 
 from app import inferencia_demo as inf
 
-COLUMNAS = ['id_sensor', 'lat', 'lon', 'prediccion_veh_h', 'real_veh_h', 'error']
+COLUMNAS = ['id_sensor', 'lat', 'lon', 'prediccion_veh_h', 'real_veh_h', 'error',
+            'persistencia_veh_h']
 
 
 @pytest.fixture(scope='module')
@@ -89,3 +90,19 @@ def test_sin_datos_no_verificable(modelo, san_juan) -> None:
     assert r.aviso == inf.AVISO_SIN_DATOS
     assert r.tabla['real_veh_h'].isna().all() and r.tabla['error'].isna().all()
     assert r.tabla['prediccion_veh_h'].notna().all()
+
+
+def test_persistencia_como_en_07(modelo, normal) -> None:
+    """La persistencia de predecir() en toda la semana da el mismo MAE que
+    persistencia_mae() de modelos/entrenamiento.py sobre esos pasos."""
+    from modelos.entrenamiento import persistencia_mae
+    ae, n = 0.0, 0
+    for j in range(len(normal.instantes)):
+        t = inf.predecir(modelo, normal, j).tabla
+        v = t['real_veh_h'].notna()
+        ae += (t['persistencia_veh_h'] - t['real_veh_h'])[v].abs().sum()
+        n += int(v.sum())
+    ds = normal.dataset
+    inicio = ds.start_offset + inf.WINDOW - 1
+    esperado, _ = persistencia_mae(ds.Y[inicio:], ds.M[inicio:])
+    assert ae / n == pytest.approx(esperado, rel=1e-5)

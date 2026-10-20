@@ -69,8 +69,10 @@ class Prediccion:
     Atributos:
         instante: hora predicha.
         tabla: una fila por sensor con id_sensor, lat, lon,
-            prediccion_veh_h, real_veh_h y error (|predicción − real|);
-            real_veh_h y error son NaN donde la máscara no es válida.
+            prediccion_veh_h, real_veh_h, error (|predicción − real|) y
+            persistencia_veh_h (Y[t], el último valor antes del instante,
+            como en 07_baseline_persistencia.py); real_veh_h y error son
+            NaN donde la máscara no es válida.
         verificable: False si la máscara está vacía en ese instante (no
             hay ningún valor real con el que comparar).
         aviso: AVISO_SIN_DATOS si no es verificable; None si lo es.
@@ -146,6 +148,8 @@ def predecir(modelo: GATCompletoPlus, semana: Semana,
     """
     j = _posicion(semana, paso)
     x, y, m = semana.dataset[j]
+    t_ahora = j + semana.dataset.start_offset + WINDOW - 1
+    persistencia = np.expm1(np.clip(semana.dataset.Y[t_ahora], 0, None))
     with torch.no_grad():
         pred_log = modelo(x.unsqueeze(0), semana.edge_index)[0]
 
@@ -157,6 +161,7 @@ def predecir(modelo: GATCompletoPlus, semana: Semana,
     tabla['prediccion_veh_h'] = prediccion
     tabla['real_veh_h'] = real
     tabla['error'] = np.abs(prediccion - real)
+    tabla['persistencia_veh_h'] = persistencia
 
     verificable = bool(valido.any())
     return Prediccion(

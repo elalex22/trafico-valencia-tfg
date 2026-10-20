@@ -50,7 +50,11 @@
   y cambia a y cuarto) y lee predicciones_<semana>.npz, que genera
   app/precalcular_predicciones.py; si cambia la muestra o el modelo, hay
   que volver a ejecutarlo. Mapa con teselas de OpenStreetMap (CartoDB pide
-  clave). Sensores sin datos en gris.
+  clave). Sensores sin datos en gris. Las líneas salen de geometria.geojson
+  (app/exportar_geometria.py): tramos oficiales (geo_shape de estat_trafic)
+  por defecto y, con un interruptor, la arista de OSM de cada sensor
+  recortada a ±75 m. Fuente de los datos: Ajuntament de València – Dades
+  Obertes (CC BY 4.0); meteorología, AEMET; viario y mapa base, OSM.
 - Dependencias de la demo en requirements-app.txt; en Docker, torch en
   versión solo CPU.
 - Python con tipado en las funciones nuevas y docstrings en español.

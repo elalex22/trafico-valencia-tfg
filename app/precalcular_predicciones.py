@@ -13,6 +13,7 @@ Claves de cada .npz:
     prediccion  (168, 1035)   float32, veh/h
     real        (168, 1035)   float32, veh/h; NaN donde la máscara no es válida
     verificable (168,)        bool, False si no hay ningún valor real
+    persistencia (168, 1035)  float32, veh/h; Y[t], el último valor antes del instante
 
 Ejecutar desde la raíz del repositorio:
     .venv\\Scripts\\python.exe app\\precalcular_predicciones.py
@@ -45,17 +46,19 @@ def precalcular(modelo, semana: Semana) -> dict[str, np.ndarray]:
     """Predice todos los instantes :15 de `semana` y devuelve los arrays
     que se guardan en el .npz."""
     posiciones = posiciones_cuarto(semana)
-    prediccion, real, verificable = [], [], []
+    prediccion, real, verificable, persistencia = [], [], [], []
     for j in posiciones:
         r = predecir(modelo, semana, int(j))
         prediccion.append(r.tabla['prediccion_veh_h'].to_numpy())
         real.append(r.tabla['real_veh_h'].to_numpy())
         verificable.append(r.verificable)
+        persistencia.append(r.tabla['persistencia_veh_h'].to_numpy())
     return {
         'instantes': instantes_disponibles(semana)[posiciones].to_numpy().astype('datetime64[ns]'),
         'prediccion': np.stack(prediccion).astype(np.float32),
         'real': np.stack(real).astype(np.float32),
         'verificable': np.array(verificable, dtype=bool),
+        'persistencia': np.stack(persistencia).astype(np.float32),
     }
 
 
