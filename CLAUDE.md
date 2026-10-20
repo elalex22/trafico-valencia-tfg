@@ -8,19 +8,26 @@
   07_baseline_persistencia → 08_entrenar_modelos → 09_analisis_temporal →
   10_ensembles.
 - Configuración central en config.py.
-- En el TFG se detectó un error de 8 meses en los datos oficiales.
+- En el TFG se detectó un error de 8 meses en los datos oficiales: datos
+  corruptos (casi todo ceros) de octubre de 2024 a mayo de 2025,
+  reconocidos por el portal y excluidos de los splits (memoria, p. 31 y 37).
+- Del 1 al 12 de junio de 2025 la fuente estuvo congelada (11,3 días con
+  valores repetidos, alrededor del 10 % del test); las métricas lo
+  incluyen, igual que en la memoria.
 - Modelo de la demo: gat_plus.pt (GAT+Plus), el mismo que usan
   09_analisis_temporal.py y 10_ensembles.py.
 
 ## Cifras
 - La demo y el README usan las métricas verificadas con los datos
   regenerados: pipeline_v2_recon/demo/metricas.json.
-- La memoria del TFG reporta una mejora del 24,5 % frente a la
-  persistencia; la reconstrucción del repositorio da la cifra de
-  metricas.json. La demo lo explica con una nota.
+- pipeline_v2_recon es una reconstrucción del pipeline del TFG. Su
+  baseline de persistencia (38,30 veh/h) coincide con el baseline.json del
+  repositorio, no con la memoria, que reporta 37,55 (Tabla 6.1, p. 50).
+- En la memoria, GAT+Plus da 28,35 y la mejora es del 24,5 % (Tabla 6.2,
+  p. 53); en la reconstrucción, 28,71 y un 25,1 %. Las coberturas de los
+  splits también difieren de la Tabla 4.2. La demo lo explica con una nota.
 - El grafo de OSM se descargó de nuevo en octubre de 2026: 2.855 aristas
-  en lugar de las 2.863 del TFG. Los 1.035 nodos coinciden y el baseline
-  de persistencia coincide exactamente (MAE en test de 38,30 veh/h).
+  en lugar de las 2.863 del TFG; los 1.035 nodos coinciden.
 
 ## Reglas
 - No reentrenar: se usan los pesos guardados en pipeline_v2_recon/models/.
