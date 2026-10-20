@@ -1,0 +1,4 @@
+# requirements-dev.txt — herramientas de desarrollo (tests), versiones
+# instaladas en el .venv de la raíz. Uso: pip install -r requirements-dev.txt
+pytest==9.1.1
+pytest-cov==7.1.0
