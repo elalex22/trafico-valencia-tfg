@@ -1,0 +1,83 @@
+{
+  "unidades": "veh/h (MAE y RMSE en test, 2025-06-01 a 2025-09-23)",
+  "baseline_persistencia": {
+    "mae": 38.3,
+    "rmse": 131.59
+  },
+  "modelo_demo": "gat_plus",
+  "modelos": {
+    "mlp_simple": {
+      "mae": 35.4,
+      "rmse": 116.76,
+      "mejora_vs_persistencia_pct": 7.58
+    },
+    "mlp_completo": {
+      "mae": 35.34,
+      "rmse": 118.31,
+      "mejora_vs_persistencia_pct": 7.74
+    },
+    "gcn_simple_v2": {
+      "mae": 33.19,
+      "rmse": 109.12,
+      "mejora_vs_persistencia_pct": 13.36
+    },
+    "gcn_completo_v2": {
+      "mae": 31.3,
+      "rmse": 104.17,
+      "mejora_vs_persistencia_pct": 18.28
+    },
+    "gcn_completo_big": {
+      "mae": 30.06,
+      "rmse": 100.07,
+      "mejora_vs_persistencia_pct": 21.52
+    },
+    "gat_completo": {
+      "mae": 28.94,
+      "rmse": 96.3,
+      "mejora_vs_persistencia_pct": 24.45
+    },
+    "gat_enriched": {
+      "mae": 28.66,
+      "rmse": 96.95,
+      "mejora_vs_persistencia_pct": 25.19
+    },
+    "gat_plus": {
+      "mae": 28.71,
+      "rmse": 98.0,
+      "mejora_vs_persistencia_pct": 25.05
+    },
+    "gat_ultra": {
+      "mae": 29.79,
+      "rmse": 100.97,
+      "mejora_vs_persistencia_pct": 22.22
+    }
+  },
+  "ensembles": {
+    "promedio_3gat": {
+      "mae": 28.0,
+      "mejora_vs_persistencia_pct": 26.91,
+      "descripcion": "Media de gat_plus, gat_completo y gat_enriched",
+      "eleccion_con_etiquetas_de_test": false
+    },
+    "oracle_dia": {
+      "mae": 28.57,
+      "mejora_vs_persistencia_pct": 25.42,
+      "descripcion": "Mejor modelo por día de la semana",
+      "eleccion_con_etiquetas_de_test": true
+    },
+    "oracle_hora": {
+      "mae": 28.19,
+      "mejora_vs_persistencia_pct": 26.4,
+      "descripcion": "Mejor modelo por hora",
+      "eleccion_con_etiquetas_de_test": true
+    },
+    "oracle_hora_dia": {
+      "mae": 27.91,
+      "mejora_vs_persistencia_pct": 27.14,
+      "descripcion": "Mejor modelo por hora × día (168 celdas)",
+      "eleccion_con_etiquetas_de_test": true
+    }
+  },
+  "nota": "La memoria del TFG reporta una mejora del 24,5 % frente a la persistencia. Estas son las cifras que reproduce el repositorio: los modelos guardados (sin reentrenar) evaluados con los datos regenerados por los scripts 01–07, con los que GAT+Plus mejora un 25,1 % a la persistencia. El grafo de OpenStreetMap se descargó de nuevo en octubre de 2026 y tiene 2.855 aristas en lugar de las 2.863 del TFG; los 1.035 nodos y el baseline de persistencia (38,30 veh/h) coinciden exactamente.",
+  "nota_ensembles": "Los ensembles proceden de resultados/ensembles.json y no se han recalculado con el grafo regenerado. Los \"oracle\" eligen el mejor modelo de cada grupo mirando las etiquetas de test, así que son una cota optimista, no un modelo desplegable."
+}
