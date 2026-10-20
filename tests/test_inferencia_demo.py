@@ -106,3 +106,12 @@ def test_persistencia_como_en_07(modelo, normal) -> None:
     inicio = ds.start_offset + inf.WINDOW - 1
     esperado, _ = persistencia_mae(ds.Y[inicio:], ds.M[inicio:])
     assert ae / n == pytest.approx(esperado, rel=1e-5)
+
+
+def test_coinciden_tolera_diferencias_entre_cpus() -> None:
+    """coinciden() acepta diferencias en el último dígito de float32 (como
+    entre Windows y Linux) y rechaza diferencias reales."""
+    a = np.array([55.99263, 0.0004, 8296.123, np.nan], dtype=np.float32)
+    assert inf.coinciden(a, np.array([55.99261, 0.0009, 8296.13, np.nan], dtype=np.float32))
+    assert not inf.coinciden(a, a + np.float32(0.5))
+    assert not inf.coinciden(a, np.array([55.99263, 0.0004, 8296.123, 1.0], dtype=np.float32))

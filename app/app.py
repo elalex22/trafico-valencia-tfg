@@ -394,11 +394,15 @@ def vista_mapa(nombre: str, dia: pd.Timestamp) -> None:
         if st.button('Calcular en vivo con el modelo'):
             import inferencia_demo
             r = inferencia_demo.predecir(modelo_en_vivo(), semana_en_vivo(nombre), instante)
-            dif = np.abs(r.tabla['prediccion_veh_h'].to_numpy() - pred).max()
-            if dif < 0.01:
+            en_vivo = r.tabla['prediccion_veh_h'].to_numpy()
+            dif = np.abs(en_vivo - pred).max()
+            # Las predicciones precalculadas se generaron en otra máquina:
+            # se comparan con la tolerancia entre CPUs, no exactamente.
+            if inferencia_demo.coinciden(en_vivo, pred):
                 st.success(f'El modelo calculado en vivo coincide con la predicción '
                            f'precalculada (diferencia máxima {dif:.2e} veh/h en '
-                           f'{len(nodos)} sensores).')
+                           f'{len(nodos)} sensores; tolerancia rtol='
+                           f'{inferencia_demo.RTOL:g}, atol={inferencia_demo.ATOL:g} veh/h).')
             else:
                 st.error(f'La predicción en vivo difiere de la precalculada '
                          f'(diferencia máxima {formato(dif, 2)} veh/h).')

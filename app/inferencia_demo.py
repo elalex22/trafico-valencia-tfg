@@ -41,6 +41,15 @@ HORIZON = 1   # config.HORIZON
 N_FEATURES = 33  # DatasetCompletoPlus
 AVISO_SIN_DATOS = 'Sin datos de la fuente oficial: predicción no verificable'
 
+# Tolerancia para comparar predicciones calculadas en máquinas distintas
+# (p. ej., las precalculadas en Windows con las de Linux en la CI, Docker o
+# Hugging Face): torch no da resultados idénticos bit a bit entre CPUs y
+# las predicciones son float32, así que pueden diferir en el último dígito
+# (5.599263e+01 frente a 5.599261e+01). rtol cubre los valores grandes y
+# atol (veh/h) los cercanos a cero.
+RTOL = 1e-5
+ATOL = 1e-3
+
 
 @dataclass
 class Semana:
@@ -115,6 +124,12 @@ def cargar_semana(nombre: str) -> Semana:
 
     nodos, edge_index = _cargar_comunes()
     return Semana(nombre, dataset, instantes, nodos, edge_index)
+
+
+def coinciden(a: np.ndarray, b: np.ndarray) -> bool:
+    """True si dos arrays de predicciones (veh/h) coinciden dentro de la
+    tolerancia RTOL/ATOL entre máquinas. Los NaN cuentan como iguales."""
+    return bool(np.allclose(a, b, rtol=RTOL, atol=ATOL, equal_nan=True))
 
 
 def instantes_disponibles(semana: Semana) -> pd.DatetimeIndex:

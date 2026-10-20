@@ -6,6 +6,12 @@ import pytest
 from app import inferencia_demo as inf
 from app import precalcular_predicciones as pre
 
+# Los .npz se precalcularon en Windows y la CI los compara con predicciones
+# hechas en Linux: torch no es idéntico bit a bit entre CPUs y los valores
+# son float32, así que se comparan con la tolerancia de inferencia_demo
+# (RTOL/ATOL), no exactamente.
+TOLERANCIA = {'rtol': inf.RTOL, 'atol': inf.ATOL}
+
 
 @pytest.fixture(scope='module')
 def modelo():
@@ -51,8 +57,8 @@ def test_coincide_con_predecir(modelo, guardado) -> None:
     semana = inf.cargar_semana(nombre)
     for k in (8, 100, 160):
         r = inf.predecir(modelo, semana, pd.Timestamp(p['instantes'][k]))
-        np.testing.assert_allclose(p['prediccion'][k], r.tabla['prediccion_veh_h'], rtol=1e-6)
-        np.testing.assert_allclose(p['real'][k], r.tabla['real_veh_h'], rtol=1e-6)
+        np.testing.assert_allclose(p['prediccion'][k], r.tabla['prediccion_veh_h'], **TOLERANCIA)
+        np.testing.assert_allclose(p['real'][k], r.tabla['real_veh_h'], **TOLERANCIA)
 
 
 def test_precalcular_igual_que_lo_guardado(modelo) -> None:
@@ -61,7 +67,8 @@ def test_precalcular_igual_que_lo_guardado(modelo) -> None:
     with np.load(pre.ruta_predicciones('semana_normal')) as npz:
         for clave in ('instantes', 'verificable'):
             assert np.array_equal(nuevo[clave], npz[clave])
-        np.testing.assert_allclose(nuevo['prediccion'], npz['prediccion'], rtol=1e-6)
+        np.testing.assert_allclose(nuevo['prediccion'], npz['prediccion'], **TOLERANCIA)
+        np.testing.assert_allclose(nuevo['persistencia'], npz['persistencia'], **TOLERANCIA)
         np.testing.assert_array_equal(np.isnan(nuevo['real']), np.isnan(npz['real']))
 
 
