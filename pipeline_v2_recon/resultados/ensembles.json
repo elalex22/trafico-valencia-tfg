@@ -1,0 +1,14 @@
+{
+  "gat_plus_individual": 28.70499038696289,
+  "oracle_dia": 28.567110061645508,
+  "promedio_3gat": 27.996004104614258,
+  "oracle_hora": 28.191675186157227,
+  "oracle_hora_dia": 27.90751075744629,
+  "reparto_victorias_hd": {
+    "gat_completo": 21,
+    "gat_plus": 69,
+    "gat_enriched": 57,
+    "gat_ultra": 14,
+    "gcn_completo_v2": 7
+  }
+}

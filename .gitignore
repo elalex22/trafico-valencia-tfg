@@ -9,7 +9,9 @@ fusion_ruido_sensores/
 
 # ── Salida generada por el pipeline (regenerable con 01→10) ──
 pipeline_v2/
-pipeline_v2_recon/
+pipeline_v2_recon/*
+!pipeline_v2_recon/models/
+!pipeline_v2_recon/resultados/
 pipeline_v2_recon_backup*/
 
 # ── Restos/duplicados encontrados en la revisión a fondo — no subir ──
@@ -50,3 +52,5 @@ inventario_resultado.txt
 # ── Sistema ──
 .DS_Store
 Thumbs.db
+_version_local/
+!pipeline_v2_recon/models/*.pt
