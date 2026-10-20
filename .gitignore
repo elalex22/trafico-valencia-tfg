@@ -12,7 +12,10 @@ pipeline_v2/
 pipeline_v2_recon/*
 !pipeline_v2_recon/models/
 !pipeline_v2_recon/resultados/
+!pipeline_v2_recon/demo/
 pipeline_v2_recon_backup*/
+# caché HTTP de osmnx (la crea 02_construccion_grafo.py)
+cache/
 
 # ── Restos/duplicados encontrados en la revisión a fondo — no subir ──
 codigos_finales/
@@ -37,11 +40,14 @@ __pycache__/
 .venv/
 venv/
 *.egg-info/
+.pytest_cache/
 
 # ── Entorno / capturas locales ──
 entorno_real.txt
 inventario_resultado.txt
 *_resultado.txt
+.env
+.streamlit/secrets.toml
 
 # ── Checkpoints y tensores pesados (usa Release de GitHub o Git LFS si quieres versionarlos) ──
 *.pt
@@ -54,3 +60,5 @@ inventario_resultado.txt
 Thumbs.db
 _version_local/
 !pipeline_v2_recon/models/*.pt
+# Muestra pequeña de la demo (una ventana, no datos completos)
+!pipeline_v2_recon/demo/**
