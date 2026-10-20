@@ -1,0 +1,15 @@
+# Configuración de herramientas. Solo ruff, aplicado al código nuevo de la
+# demo; los scripts del pipeline (01–10, config.py, modelos/ y datos/) no
+# se tocan y quedan fuera.
+
+[tool.ruff]
+target-version = "py310"
+line-length = 110
+include = ["app/**/*.py", "tests/**/*.py", "verificar_resultados.py", "analisis_adicional.py"]
+extend-exclude = ["0*.py", "10_ensembles.py", "config.py", "modelos", "datos"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "config", "datos", "modelos", "inferencia_demo"]

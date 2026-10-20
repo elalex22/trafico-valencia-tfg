@@ -1,3 +1,5 @@
+[![CI](https://github.com/elalex22/trafico-valencia-tfg/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/elalex22/trafico-valencia-tfg/actions/workflows/ci.yml)
+
 # Pipeline de predicción de tráfico — Valencia Smart City
 
 **Autor:** Alejandro Navarro del Castillo

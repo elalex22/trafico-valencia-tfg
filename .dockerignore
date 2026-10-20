@@ -3,6 +3,7 @@
 *
 
 !Dockerfile
+!requirements-torch-cpu.txt
 !requirements-app.txt
 !app/app.py
 !app/inferencia_demo.py

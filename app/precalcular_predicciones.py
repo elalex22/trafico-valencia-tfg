@@ -26,8 +26,15 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from inferencia_demo import (DEMO_DIR, SEMANAS, Semana, cargar_modelo,  # noqa: E402
-                             cargar_semana, instantes_disponibles, predecir)
+from inferencia_demo import (  # noqa: E402
+    DEMO_DIR,
+    SEMANAS,
+    Semana,
+    cargar_modelo,
+    cargar_semana,
+    instantes_disponibles,
+    predecir,
+)
 
 MINUTO = 15
 

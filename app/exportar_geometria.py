@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Any
 
 import numpy as np
-import osmnx as ox
 import pandas as pd
 from shapely.geometry import LineString, Point, mapping, shape
 from shapely.ops import substring
@@ -113,6 +112,7 @@ def recortar(arista: LineString, sensor: Point, metros: float = RECORTE_M) -> Li
 
 def features_sensores(asignacion: pd.DataFrame) -> list[dict[str, Any]]:
     """Capa 'sensor': la arista de OSM de cada sensor, recortada."""
+    import osmnx as ox  # aquí y no arriba: los tests y la CI no necesitan osmnx
     G = ox.load_graphml(GRAPH_DIR / 'valencia_drive.graphml')
     mm = pd.read_csv(EDA / 'mapmatching_prueba.csv')
     tramo = asignacion.set_index('id_sensor')['id_tramo']

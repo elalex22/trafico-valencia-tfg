@@ -19,17 +19,18 @@ WORKDIR /srv/trafico
 # typing_extensions) e intenta compilarlas desde el código fuente.
 RUN pip install pip==26.2.1
 
-# ── torch solo CPU (índice de PyTorch para CPU), la versión del .venv ────
-# Capa aparte: es la más pesada y casi nunca cambia.
-RUN pip install torch==2.13.0 --index-url https://download.pytorch.org/whl/cpu
+# ── torch solo CPU, torch-geometric y numpy (versiones del .venv) ────────
+# requirements-torch-cpu.txt es el mismo archivo que usa la CI. Capa aparte:
+# es la más pesada y casi nunca cambia.
+COPY requirements-torch-cpu.txt .
+RUN pip install -r requirements-torch-cpu.txt
 
 # ── Resto de dependencias de la app ──────────────────────────────────────
-# torch-geometric (GATConv) y numpy con las versiones del .venv, más
 # requirements-app.txt (pandas, streamlit, folium, streamlit-folium, plotly).
 # Ni osmnx ni scipy: solo los usan los scripts del pipeline. pyarrow entra
 # porque streamlit lo exige.
 COPY requirements-app.txt .
-RUN pip install numpy==2.2.6 torch-geometric==2.8.0.post1 -r requirements-app.txt
+RUN pip install -r requirements-app.txt
 
 # ── Usuario sin privilegios ──────────────────────────────────────────────
 RUN useradd --create-home --uid 1000 appuser

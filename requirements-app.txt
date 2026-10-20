@@ -1,5 +1,5 @@
 # requirements-app.txt — dependencias de la demo (app/), además de torch
-# y torch-geometric de requirements.txt (en Docker, torch solo CPU).
+# y torch-geometric de requirements-torch-cpu.txt (Docker y CI, solo CPU).
 # Versiones instaladas en el .venv de la raíz (Python 3.10).
 # Uso: pip install -r requirements-app.txt
 pandas==2.3.3

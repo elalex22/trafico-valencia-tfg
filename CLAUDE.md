@@ -72,7 +72,11 @@
   certificados, avisar en lugar de desactivar la verificación.
 
 ## Comandos
+- Lint: ruff check . (configurado en pyproject.toml, solo para el código
+  nuevo: app/, tests/, verificar_resultados.py y analisis_adicional.py)
 - Tests: pytest -q
+- CI: .github/workflows/ci.yml (ruff, pytest y build + healthcheck de
+  Docker); torch CPU sale de requirements-torch-cpu.txt, igual que en Docker
 - Demo: streamlit run app/app.py
 - Docker (build): docker build -t trafico-valencia .
 - Docker (run): docker run -p 8501:8501 trafico-valencia
