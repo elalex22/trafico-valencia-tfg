@@ -175,10 +175,15 @@ def pie() -> None:
 
 # ── Pestaña: mapa de predicción ──────────────────────────────────────────
 
-@st.cache_resource
 def mapa_base(vmax: float) -> folium.Map:
-    """Mapa base (teselas de OpenStreetMap, sin clave) con las leyendas. Se
-    crea una sola vez para que streamlit-folium no lo vuelva a dibujar."""
+    """Mapa base (teselas de OpenStreetMap, sin clave) con las leyendas.
+
+    Se crea de nuevo en cada ejecución y no se cachea: st_folium añade la
+    capa de feature_group_to_add al mapa que recibe, y con un objeto
+    cacheado la capa anterior se acumula y el componente queda con 0 px de
+    alto desde la segunda ejecución. No hace falta cachearlo para evitar el
+    parpadeo: st_folium calcula su clave con los identificadores de folium
+    normalizados, así que un mapa idéntico no se vuelve a dibujar."""
     nodos = cargar_nodos()
     mapa = folium.Map(location=[nodos.lat.mean(), nodos.lon.mean()], zoom_start=13,
                       tiles='OpenStreetMap')

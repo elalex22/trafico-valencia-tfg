@@ -75,3 +75,20 @@ def test_reproducir_para_al_final_del_dia(app) -> None:
     app.run()
     assert not app.exception
     assert app.session_state['hora'] == 23 and not app.session_state['reproduciendo']
+
+
+def test_mapa_base_no_acumula_la_capa(app) -> None:
+    """Regresión: con el mapa base cacheado, st_folium le añadía la capa de
+    tráfico y desde la segunda ejecución el mapa salía en blanco. El script
+    del mapa base debe ser el mismo en cada ejecución y no llevar la capa."""
+    import json
+
+    def script_mapa() -> str:
+        comp = next(e for e in app.main if 'component' in str(getattr(e, 'type', '')).lower())
+        return json.loads(comp.proto.json_args)['script']
+
+    primero = script_mapa()
+    app.select_slider[0].set_value(9).run()
+    app.run()
+    assert 'L.featureGroup' not in primero and 'L.featureGroup' not in script_mapa()
+    assert len(script_mapa()) == len(primero)
