@@ -32,8 +32,12 @@
   carpeta original: solo se leen; nunca se modifican, mueven ni borran.
 - Código nuevo de la demo en app/; la inferencia, en app/inferencia_demo.py,
   que recibe una sola ventana. Tests en tests/.
-- Muestra de la demo en pipeline_v2_recon/demo/: una ventana de unos
-  20 pasos × 1035 nodos, más edge_index y node_order.
+- Muestra de la demo en pipeline_v2_recon/demo/ (la genera
+  app/crear_muestra_demo.py): dos semanas de test, semana_normal.npz
+  (2–8 de junio de 2025) y semana_san_juan.npz (23–29 de junio de 2025),
+  cada una un .npz comprimido en float32 con 692 pasos × 1035 nodos (672
+  de la semana + 20 de contexto para gat_plus), más node_order.csv,
+  edge_index_final.npy, stats.json y config.json.
 - Dependencias de la demo en requirements-app.txt; en Docker, torch en
   versión solo CPU.
 - Python con tipado en las funciones nuevas y docstrings en español.
