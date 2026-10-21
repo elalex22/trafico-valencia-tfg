@@ -14,15 +14,21 @@ permissions:
 
 jobs:
   tests:
-    name: ruff y pytest
+    name: ruff y pytest (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
+    # 3.10: la del .venv y la imagen Docker. 3.11: la de Streamlit Community
+    # Cloud. Sin fail-fast, para ver el resultado de las dos aunque falle una.
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11"]
     steps:
       - uses: actions/checkout@v5
 
-      # Python 3.10, el mismo que el .venv y la imagen Docker, con caché de pip.
+      # Python de la matriz, con caché de pip.
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: ${{ matrix.python-version }}
           cache: pip
           cache-dependency-path: |
             requirements-torch-cpu.txt

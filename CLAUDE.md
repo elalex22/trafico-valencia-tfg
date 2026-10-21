@@ -19,7 +19,10 @@
 
 ## Cifras
 - La demo y el README usan las métricas verificadas con los datos
-  regenerados: pipeline_v2_recon/demo/metricas.json.
+  regenerados: pipeline_v2_recon/demo/metricas.json, que genera
+  app/escribir_metricas.py a partir de demo/verificacion.json,
+  resultados/baseline.json y resultados/ensembles.json (mejoras con 4
+  decimales, redondeadas una sola vez al mostrarlas).
 - pipeline_v2_recon es una reconstrucción del pipeline del TFG. Su
   baseline de persistencia (38,30 veh/h) coincide con el baseline.json del
   repositorio, no con la memoria, que reporta 37,55 (Tabla 6.1, p. 50).
@@ -81,8 +84,10 @@
 - Lint: ruff check . (configurado en pyproject.toml, solo para el código
   nuevo: app/, tests/, verificar_resultados.py y analisis_adicional.py)
 - Tests: pytest -q
-- CI: .github/workflows/ci.yml (ruff, pytest y build + healthcheck de
-  Docker); torch CPU sale de requirements-torch-cpu.txt, igual que en Docker
+- CI: .github/workflows/ci.yml (ruff y pytest con Python 3.10 y 3.11, y
+  build + healthcheck de Docker); torch CPU sale de
+  requirements-torch-cpu.txt, igual que en Docker
+- Métricas de la demo: python app/escribir_metricas.py
 - Demo: streamlit run app/app.py
 - Docker (build): docker build -t trafico-valencia .
 - Docker (run): docker run -p 8501:8501 trafico-valencia

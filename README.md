@@ -151,7 +151,7 @@ Necesita los datos brutos (no incluidos) en seis carpetas de la raíz: `estat_tr
 
 - **ruff** (`ruff check .`) revisa el código nuevo: `app/`, `tests/`, `verificar_resultados.py` y `analisis_adicional.py`. Los scripts del pipeline no se tocan.
 - **pytest** (`pytest -q`, 44 tests) cubre la inferencia de una ventana, las predicciones precalculadas, la geometría del mapa, la app (con `streamlit.testing`), la coherencia de las métricas y la calidad de los datos (régimen corrupto, congelación de junio y baseline de 38,30). Los 4 tests que necesitan los datos completos (los Parquet de `01` y los tensores de `05`) se saltan solos si faltan.
-- **GitHub Actions** ([`ci.yml`](.github/workflows/ci.yml)), en cada push y pull request a `main` y `demo-web`: ruff y pytest con Python 3.10 y torch CPU; y construcción de la imagen Docker con espera a que el healthcheck esté en *healthy*.
+- **GitHub Actions** ([`ci.yml`](.github/workflows/ci.yml)), en cada push y pull request a `main` y `demo-web`: ruff y pytest con Python 3.10 (la del proyecto) y 3.11 (la del despliegue) y torch CPU; y construcción de la imagen Docker con espera a que el healthcheck esté en *healthy*.
 
 ## Lecciones aprendidas
 
