@@ -7,7 +7,7 @@
 
 GAT+Plus, una red de atención sobre grafos, predice la intensidad de tráfico de 1.035 espiras de València con 15 minutos de antelación: MAE de 28,71 veh/h, un 25,0 % mejor que la persistencia.
 
-**Demo en vivo:** DEMO_URL
+**Demo en vivo:** [trafico-valencia.streamlit.app](https://trafico-valencia.streamlit.app/)
 
 ![Demo: mapa de predicción de la semana normal, reproducido hora a hora](docs/img/demo.gif)
 
@@ -127,7 +127,7 @@ La app lee las predicciones precalculadas; el modelo solo se carga con el botón
 
 ### Despliegue en Streamlit Community Cloud
 
-La demo en vivo (DEMO_URL) se despliega gratis en [Streamlit Community Cloud](https://streamlit.io/cloud), conectada a este repositorio:
+La [demo en vivo](https://trafico-valencia.streamlit.app/) se despliega gratis en [Streamlit Community Cloud](https://streamlit.io/cloud), conectada a este repositorio:
 
 1. *Create app* → repositorio `elalex22/trafico-valencia-tfg`, rama `main`, archivo principal `app/app.py`.
 2. En *Advanced settings*, Python **3.11** (la 3.10 del proyecto ya no tiene soporte). No hacen falta secretos.

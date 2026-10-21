@@ -65,7 +65,7 @@
   rama main, archivo principal app/app.py, Python 3.11 en Advanced
   settings; instala app/requirements.txt, que solo remite a los dos
   archivos anteriores. Memoria medida: ~210 MB, ~600 MB tras el cálculo
-  en vivo. URL pública pendiente (marcador DEMO_URL en el README).
+  en vivo. URL pública: https://trafico-valencia.streamlit.app/
 - Python con tipado en las funciones nuevas y docstrings en español.
 - Ejecutar pytest tras cada cambio.
 - Ningún dato completo ni ninguna clave en el repositorio.
