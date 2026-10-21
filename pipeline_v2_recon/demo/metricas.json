@@ -1,0 +1,92 @@
+{
+  "unidades": "veh/h (MAE y RMSE en test, 2025-06-01 a 2025-09-23)",
+  "baseline_persistencia": {
+    "mae": 38.3,
+    "rmse": 131.59
+  },
+  "modelo_demo": "gat_plus",
+  "modelos": {
+    "mlp_simple": {
+      "mae": 35.4,
+      "rmse": 116.76,
+      "mejora_vs_persistencia_pct": 7.58
+    },
+    "mlp_completo": {
+      "mae": 35.34,
+      "rmse": 118.31,
+      "mejora_vs_persistencia_pct": 7.74
+    },
+    "gcn_simple_v2": {
+      "mae": 33.19,
+      "rmse": 109.12,
+      "mejora_vs_persistencia_pct": 13.36
+    },
+    "gcn_completo_v2": {
+      "mae": 31.3,
+      "rmse": 104.17,
+      "mejora_vs_persistencia_pct": 18.28
+    },
+    "gcn_completo_big": {
+      "mae": 30.06,
+      "rmse": 100.07,
+      "mejora_vs_persistencia_pct": 21.52
+    },
+    "gat_completo": {
+      "mae": 28.94,
+      "rmse": 96.3,
+      "mejora_vs_persistencia_pct": 24.45
+    },
+    "gat_enriched": {
+      "mae": 28.66,
+      "rmse": 96.95,
+      "mejora_vs_persistencia_pct": 25.19
+    },
+    "gat_plus": {
+      "mae": 28.71,
+      "rmse": 98.0,
+      "mejora_vs_persistencia_pct": 25.05
+    },
+    "gat_ultra": {
+      "mae": 29.79,
+      "rmse": 100.97,
+      "mejora_vs_persistencia_pct": 22.22
+    }
+  },
+  "ensembles": {
+    "promedio_3gat": {
+      "mae": 28.0,
+      "mejora_vs_persistencia_pct": 26.91,
+      "descripcion": "Media de gat_plus, gat_completo y gat_enriched",
+      "eleccion_con_etiquetas_de_test": false
+    },
+    "oracle_dia": {
+      "mae": 28.57,
+      "mejora_vs_persistencia_pct": 25.42,
+      "descripcion": "Mejor modelo por día de la semana",
+      "eleccion_con_etiquetas_de_test": true
+    },
+    "oracle_hora": {
+      "mae": 28.19,
+      "mejora_vs_persistencia_pct": 26.4,
+      "descripcion": "Mejor modelo por hora",
+      "eleccion_con_etiquetas_de_test": true
+    },
+    "oracle_hora_dia": {
+      "mae": 27.91,
+      "mejora_vs_persistencia_pct": 27.14,
+      "descripcion": "Mejor modelo por hora × día (168 celdas)",
+      "eleccion_con_etiquetas_de_test": true
+    }
+  },
+  "memoria_tfg": {
+    "persistencia_mae": 37.55,
+    "persistencia_rmse": 128.14,
+    "gat_plus_mae": 28.35,
+    "gat_plus_rmse": 95.39,
+    "mejora_gat_plus_pct": 24.5,
+    "fuente": "Memoria del TFG, Tabla 6.1 (p. 50) y Tabla 6.2 (p. 53)"
+  },
+  "nota": "pipeline_v2_recon es una reconstrucción del pipeline del TFG: los modelos guardados (sin reentrenar) evaluados con los datos regenerados por los scripts 01–07. Su baseline de persistencia (38,30 veh/h) coincide con el baseline.json del repositorio, no con la memoria, que reporta 37,55 veh/h (Tabla 6.1, p. 50). En la memoria, GAT+Plus da 28,35 veh/h y mejora un 24,5 % a la persistencia (Tabla 6.2, p. 53); en la reconstrucción, 28,71 veh/h y un 25,1 %. Las coberturas de los splits también difieren de la Tabla 4.2 de la memoria. El grafo de OpenStreetMap se descargó de nuevo en octubre de 2026 y tiene 2.855 aristas en lugar de las 2.863 del TFG; los 1.035 nodos coinciden.",
+  "nota_datos": "El error de 8 meses del TFG son datos corruptos (casi todo ceros) de la fuente oficial de espiras entre octubre de 2024 y mayo de 2025, que el portal reconocía como \"temporalmente con errores de procesamiento\"; esos meses quedan excluidos de los tres splits (memoria, p. 31 y 37). Además, del 1 al 12 de junio de 2025 la fuente estuvo congelada: 11,3 días con los valores repetidos, alrededor del 10 % del test. Las métricas lo incluyen. Durante la primera semana de test (1–7 de junio de 2025), la variable lag7d procede del 25–31 de mayo de 2025, que cae en el régimen corrupto.",
+  "nota_ensembles": "Los ensembles proceden de resultados/ensembles.json y no se han recalculado con el grafo regenerado. Los \"oracle\" eligen el mejor modelo de cada grupo mirando las etiquetas de test, así que son una cota optimista, no un modelo desplegable."
+}

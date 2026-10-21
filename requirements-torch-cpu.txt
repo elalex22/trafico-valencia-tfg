@@ -1,0 +1,8 @@
+# requirements-torch-cpu.txt — torch solo CPU y torch-geometric, con las
+# versiones del .venv. Lo usan el Dockerfile y la CI (.github/workflows/ci.yml).
+# torch se fija con "+cpu" para que solo pueda venir del índice de CPU de
+# PyTorch; el resto sale de PyPI. Uso: pip install -r requirements-torch-cpu.txt
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.13.0+cpu
+torch-geometric==2.8.0.post1
+numpy==2.2.6

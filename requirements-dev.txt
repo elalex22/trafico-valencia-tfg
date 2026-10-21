@@ -1,0 +1,7 @@
+# requirements-dev.txt — herramientas de desarrollo (tests y lint), versiones
+# instaladas en el .venv de la raíz (Python 3.10). Uso: pip install -r requirements-dev.txt
+pytest==9.1.1
+pytest-cov==7.1.0
+ruff==0.17.1
+# shapely: lo usan app/exportar_geometria.py y sus tests
+shapely==2.1.2

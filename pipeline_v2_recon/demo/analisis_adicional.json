@@ -1,0 +1,27 @@
+{
+  "unidades": "veh/h; MAE sobre las celdas con máscara válida",
+  "casos": {
+    "a_test_completo": {
+      "mae_gat_plus": 28.71,
+      "mae_persistencia": 38.38,
+      "mejora_pct": 25.19,
+      "instantes": 11020,
+      "celdas_validas": 9835361
+    },
+    "b_solo_15": {
+      "mae_gat_plus": 113.49,
+      "mae_persistencia": 152.33,
+      "mejora_pct": 25.5,
+      "instantes": 2755,
+      "celdas_validas": 2460121
+    },
+    "c_solo_15_sin_congelacion": {
+      "mae_gat_plus": 126.39,
+      "mae_persistencia": 169.81,
+      "mejora_pct": 25.57,
+      "instantes": 2472,
+      "celdas_validas": 2189616
+    }
+  },
+  "nota": "Las dos métricas se calculan sobre los mismos objetivos: los de DatasetCompletoPlus (test desde 2025-06-01 05:00, 20 pasos de contexto). Por eso la persistencia del caso (a) difiere ligeramente de la de baseline.json (38,30), que empieza en el segundo paso del test. Instantes :15: los únicos en los que llega el valor horario nuevo. Congelación: se excluyen los días completos del 1 al 12 de junio de 2025."
+}

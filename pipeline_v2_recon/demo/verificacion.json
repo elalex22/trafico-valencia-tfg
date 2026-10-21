@@ -1,0 +1,77 @@
+{
+  "persistencia_mae_test": 38.30473173710961,
+  "modelos": [
+    {
+      "modelo": "mlp_simple",
+      "mae_entrenamiento_json": 35.40051307707518,
+      "mae_actual": 35.399320195337914,
+      "diferencia_mae": -0.0011928817372677258,
+      "rmse_actual": 116.759754550704,
+      "mejora_vs_persistencia_pct": 7.584993837607108
+    },
+    {
+      "modelo": "mlp_completo",
+      "mae_entrenamiento_json": 35.343448690863404,
+      "mae_actual": 35.3416623843104,
+      "diferencia_mae": -0.001786306553000827,
+      "rmse_actual": 118.31190157590542,
+      "mejora_vs_persistencia_pct": 7.735517828802828
+    },
+    {
+      "modelo": "gcn_simple_v2",
+      "mae_entrenamiento_json": 33.18583495440972,
+      "mae_actual": 33.186444641474736,
+      "diferencia_mae": 0.0006096870650154074,
+      "rmse_actual": 109.1209519785107,
+      "mejora_vs_persistencia_pct": 13.362023080496558
+    },
+    {
+      "modelo": "gcn_completo_v2",
+      "mae_entrenamiento_json": 31.29881353326473,
+      "mae_actual": 31.302866687398854,
+      "diferencia_mae": 0.004053154134123105,
+      "rmse_actual": 104.17361413791122,
+      "mejora_vs_persistencia_pct": 18.279373675726212
+    },
+    {
+      "modelo": "gcn_completo_big",
+      "mae_entrenamiento_json": 30.05987963607329,
+      "mae_actual": 30.061875553850673,
+      "diferencia_mae": 0.0019959177773820613,
+      "rmse_actual": 100.0673530444739,
+      "mejora_vs_persistencia_pct": 21.51915914678829
+    },
+    {
+      "modelo": "gat_completo",
+      "mae_entrenamiento_json": 28.935831441555628,
+      "mae_actual": 28.938002587745313,
+      "diferencia_mae": 0.002171146189684947,
+      "rmse_actual": 96.30117100916799,
+      "mejora_vs_persistencia_pct": 24.4531908320084
+    },
+    {
+      "modelo": "gat_enriched",
+      "mae_entrenamiento_json": 28.658314839362696,
+      "mae_actual": 28.656164190203217,
+      "diferencia_mae": -0.0021506491594784904,
+      "rmse_actual": 96.95440718015,
+      "mejora_vs_persistencia_pct": 25.18897042048428
+    },
+    {
+      "modelo": "gat_plus",
+      "mae_entrenamiento_json": 28.70498049396306,
+      "mae_actual": 28.709754571855118,
+      "diferencia_mae": 0.004774077892058415,
+      "rmse_actual": 98.00148467386904,
+      "mejora_vs_persistencia_pct": 25.049065037463464
+    },
+    {
+      "modelo": "gat_ultra",
+      "mae_entrenamiento_json": 29.783828171781465,
+      "mae_actual": 29.791656008959194,
+      "diferencia_mae": 0.007827837177728725,
+      "rmse_actual": 100.96517743178188,
+      "mejora_vs_persistencia_pct": 22.224606052789436
+    }
+  ]
+}
