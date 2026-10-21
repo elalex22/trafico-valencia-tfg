@@ -1,0 +1,6 @@
+# Dependencias de la demo para Streamlit Community Cloud, que busca este
+# archivo primero junto al archivo principal (app/app.py) y así no usa el
+# requirements.txt de la raíz (el del pipeline completo, con osmnx).
+# Las versiones están en un solo sitio, compartido con Docker y la CI:
+-r ../requirements-torch-cpu.txt
+-r ../requirements-app.txt

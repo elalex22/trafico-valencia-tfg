@@ -43,7 +43,7 @@ AVISO_SIN_DATOS = 'Sin datos de la fuente oficial: predicción no verificable'
 
 # Tolerancia para comparar predicciones calculadas en máquinas distintas
 # (p. ej., las precalculadas en Windows con las de Linux en la CI, Docker o
-# Hugging Face): torch no da resultados idénticos bit a bit entre CPUs y
+# Streamlit Community Cloud): torch no da resultados idénticos bit a bit entre CPUs y
 # las predicciones son float32, así que pueden diferir en el último dígito
 # (5.599263e+01 frente a 5.599261e+01). rtol cubre los valores grandes y
 # atol (veh/h) los cercanos a cero.

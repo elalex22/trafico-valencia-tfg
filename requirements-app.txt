@@ -1,9 +1,13 @@
 # requirements-app.txt — dependencias de la demo (app/), además de torch
-# y torch-geometric de requirements-torch-cpu.txt (Docker y CI, solo CPU).
+# y torch-geometric de requirements-torch-cpu.txt (solo CPU). Lo usan Docker, la
+# CI y Streamlit Community Cloud (a través de app/requirements.txt).
 # Versiones instaladas en el .venv de la raíz (Python 3.10).
 # Uso: pip install -r requirements-app.txt
 pandas==2.3.3
 streamlit==1.59.1
+# starlette fijado: con la 1.9.0, el middleware gzip de streamlit 1.59.1 falla al
+# servir archivos estáticos (RuntimeError "Expected ASGI message" en cada visita).
+starlette==1.7.0
 folium==0.20.0
 streamlit-folium==0.26.2
 plotly==7.1.0

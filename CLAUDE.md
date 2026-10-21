@@ -24,7 +24,7 @@
   baseline de persistencia (38,30 veh/h) coincide con el baseline.json del
   repositorio, no con la memoria, que reporta 37,55 (Tabla 6.1, p. 50).
 - En la memoria, GAT+Plus da 28,35 y la mejora es del 24,5 % (Tabla 6.2,
-  p. 53); en la reconstrucción, 28,71 y un 25,1 %. Las coberturas de los
+  p. 53); en la reconstrucción, 28,71 y un 25,0 %. Las coberturas de los
   splits también difieren de la Tabla 4.2. La demo lo explica con una nota.
 - El grafo de OSM se descargó de nuevo en octubre de 2026: 2.855 aristas
   en lugar de las 2.863 del TFG; los 1.035 nodos coinciden.
@@ -55,8 +55,14 @@
   por defecto y, con un interruptor, la arista de OSM de cada sensor
   recortada a ±75 m. Fuente de los datos: Ajuntament de València – Dades
   Obertes (CC BY 4.0); meteorología, AEMET; viario y mapa base, OSM.
-- Dependencias de la demo en requirements-app.txt; en Docker, torch en
-  versión solo CPU.
+- Dependencias de la demo en requirements-app.txt (con starlette fijado:
+  la 1.9.0 rompe el gzip de streamlit 1.59.1); torch solo CPU en
+  requirements-torch-cpu.txt. Los usan Docker, la CI y el despliegue.
+- Despliegue de la demo en Streamlit Community Cloud (no Hugging Face):
+  rama main, archivo principal app/app.py, Python 3.11 en Advanced
+  settings; instala app/requirements.txt, que solo remite a los dos
+  archivos anteriores. Memoria medida: ~210 MB, ~600 MB tras el cálculo
+  en vivo. URL pública pendiente (marcador DEMO_URL en el README).
 - Python con tipado en las funciones nuevas y docstrings en español.
 - Ejecutar pytest tras cada cambio.
 - Ningún dato completo ni ninguna clave en el repositorio.

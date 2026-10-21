@@ -5,7 +5,7 @@
 **Autor:** Alejandro Navarro del Castillo\
 **Trabajo de Fin de Grado — Grado en Ciencia de Datos, Universitat Politècnica de València**
 
-GAT+Plus, una red de atención sobre grafos, predice la intensidad de tráfico de 1.035 espiras de València con 15 minutos de antelación: MAE de 28,71 veh/h, un 25,1 % mejor que la persistencia.
+GAT+Plus, una red de atención sobre grafos, predice la intensidad de tráfico de 1.035 espiras de València con 15 minutos de antelación: MAE de 28,71 veh/h, un 25,0 % mejor que la persistencia.
 
 **Demo en vivo:** DEMO_URL
 
@@ -56,7 +56,7 @@ MAE y RMSE en test (veh/h), con los pesos guardados evaluados sobre los datos re
 |---|---|---|---|
 | Persistencia | 38,30 | 131,59 | — |
 | GAT Enriched | 28,66 | 96,95 | 25,2 % |
-| **GAT+Plus** | **28,71** | **98,00** | **25,1 %** |
+| **GAT+Plus** | **28,71** | **98,00** | **25,0 %** |
 | GAT Completo | 28,94 | 96,30 | 24,5 % |
 | GAT Ultra | 29,79 | 100,97 | 22,2 % |
 | GCN Completo Big | 30,06 | 100,07 | 21,5 % |
@@ -65,7 +65,7 @@ MAE y RMSE en test (veh/h), con los pesos guardados evaluados sobre los datos re
 | MLP Completo | 35,34 | 118,31 | 7,7 % |
 | MLP Simple | 35,40 | 116,76 | 7,6 % |
 
-- **Memoria frente a reconstrucción.** `pipeline_v2_recon` reconstruye el pipeline del TFG. La memoria da una persistencia de 37,55 veh/h (Tabla 6.1, p. 50) y GAT+Plus con 28,35 y una mejora del 24,5 % (Tabla 6.2, p. 53). La reconstrucción da 38,30, 28,71 y 25,1 %. Las coberturas de los splits también difieren de la Tabla 4.2, y el grafo de OSM se descargó de nuevo (2.855 aristas en lugar de 2.863; los 1.035 nodos coinciden).
+- **Memoria frente a reconstrucción.** `pipeline_v2_recon` reconstruye el pipeline del TFG. La memoria da una persistencia de 37,55 veh/h (Tabla 6.1, p. 50) y GAT+Plus con 28,35 y una mejora del 24,5 % (Tabla 6.2, p. 53). La reconstrucción da 38,30, 28,71 y 25,0 %. Las coberturas de los splits también difieren de la Tabla 4.2, y el grafo de OSM se descargó de nuevo (2.855 aristas en lugar de 2.863; los 1.035 nodos coinciden).
 - **GAT Enriched queda 0,05 veh/h por delante** en la reconstrucción, una diferencia despreciable. La demo usa GAT+Plus por coherencia con la memoria y con los análisis temporal (`09`) y de ensembles (`10`).
 - **Ensembles.** El promedio de 3 GAT, el único ensemble desplegable, baja el MAE a 28,00 (de `resultados/ensembles.json`, sin recalcular con el grafo regenerado). Los «oracle» no se incluyen: eligen el modelo mirando las etiquetas de test.
 
@@ -124,6 +124,15 @@ py -3.10 -m venv .venv
 ```
 
 La app lee las predicciones precalculadas; el modelo solo se carga con el botón «Calcular en vivo con el modelo».
+
+### Despliegue en Streamlit Community Cloud
+
+La demo en vivo (DEMO_URL) se despliega gratis en [Streamlit Community Cloud](https://streamlit.io/cloud), conectada a este repositorio:
+
+1. *Create app* → repositorio `elalex22/trafico-valencia-tfg`, rama `main`, archivo principal `app/app.py`.
+2. En *Advanced settings*, Python **3.11** (la 3.10 del proyecto ya no tiene soporte). No hacen falta secretos.
+
+Community Cloud instala [`app/requirements.txt`](app/requirements.txt), que tiene prioridad sobre el `requirements.txt` de la raíz (el del pipeline completo) y solo remite a `requirements-torch-cpu.txt` y `requirements-app.txt`, los mismos de Docker y la CI. La app usa unos 210 MB de memoria y hasta 600 MB si se pulsa «Calcular en vivo» (carga torch); el límite de Community Cloud está entre 690 MB y 2,7 GB.
 
 ### Pipeline completo
 
